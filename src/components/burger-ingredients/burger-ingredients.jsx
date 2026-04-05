@@ -21,9 +21,6 @@ const BurgerIngredientsBody = ({ ingredients, count, handleAdd }) => {
   refs['bun'] = useRef(null);
   refs['main'] = useRef(null);
   refs['sauce'] = useRef(null);
-  // types.forEach((type) => {
-  //   refs[type.type] = useRef(null);
-  // });
 
   return (
     <section className={styles.burger_ingredients}>

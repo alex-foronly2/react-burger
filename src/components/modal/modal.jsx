@@ -24,7 +24,6 @@ function Modal({ children, header, onClose }) {
     <>
       <div className={styles.modal}>
         <ModalOverlay onClose={onClose} />
-        {/*<div className={styles.overlay} />*/}
 
         <div className={`${styles.popup} card`}>
           <div className={`${styles.modal_header}`}>
@@ -33,9 +32,6 @@ function Modal({ children, header, onClose }) {
             <CloseIcon type="primary" className="c-pointer" onClick={onClose} />
           </div>
           {children}
-          {/*<button className="cancel" onClick={onClose}>*/}
-          {/*  Закрыть*/}
-          {/*</button>*/}
         </div>
       </div>
     </>,
