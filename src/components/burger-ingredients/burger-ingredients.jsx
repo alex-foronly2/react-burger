@@ -1,36 +1,41 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useRef, memo } from 'react';
 
 import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredient';
 
 import styles from './burger-ingredients.module.css';
 
-export const BurgerIngredients = ({ ingredients }) => {
-  const [activeTab, setTab] = useState(0);
-  console.log(styles);
+const BurgerIngredientsBody = ({ ingredients, count, handleAdd }) => {
+  const [activeTab, setTab] = useState('bun');
   const handleTab = function (newTab) {
-    console.log(newTab);
     setTab(newTab);
+    refs[newTab].current?.scrollIntoView({ behavior: 'smooth' });
   };
+
   const types = [
     { type: 'bun', name: 'Булки' },
     { type: 'main', name: 'Начинки' },
     { type: 'sauce', name: 'Соусы' },
   ];
-  console.log(ingredients);
+  const refs = {};
+  refs['bun'] = useRef(null);
+  refs['main'] = useRef(null);
+  refs['sauce'] = useRef(null);
+  // types.forEach((type) => {
+  //   refs[type.type] = useRef(null);
+  // });
 
   return (
     <section className={styles.burger_ingredients}>
       <nav>
         <ul className={styles.menu}>
-          {types.map((type, index) => (
-            <Fragment key={index}>
+          {types.map((type) => (
+            <Fragment key={type.type}>
               <Tab
                 value={type.type}
-                active={activeTab === index}
+                active={activeTab === type.type}
                 onClick={() => {
-                  handleTab(index);
-                  /* TODO */
+                  handleTab(type.type);
                 }}
               >
                 {type.name}
@@ -39,20 +44,27 @@ export const BurgerIngredients = ({ ingredients }) => {
           ))}
         </ul>
       </nav>
-      <div className={styles.burger_ingredients_content}>
-        {types.map((type, index) => (
-          <Fragment key={index}>
-            <h2 className="text text_type_main-medium mt-10 mb-6">{type.name}</h2>
-            {/*<div className={styles.burger_ingredients__items}>*/}
+      <div className={`${styles.burger_ingredients_content} custom-scroll mb-10`}>
+        {types.map((type) => (
+          <Fragment key={type.type}>
+            <h2 className="text text_type_main-medium mt-10 mb-6" ref={refs[type.type]}>
+              {type.name}
+            </h2>
             {ingredients
               .filter((ingredients) => ingredients.type === type.type)
               .map((ingredient) => (
-                <BurgerIngredient {...ingredient} key={ingredient._id} />
+                <BurgerIngredient
+                  {...ingredient}
+                  onAdd={handleAdd}
+                  key={ingredient._id}
+                  count={count[ingredient._id] || 0}
+                />
               ))}
-            {/*</div>*/}
           </Fragment>
         ))}
       </div>
     </section>
   );
 };
+
+export const BurgerIngredients = memo(BurgerIngredientsBody);

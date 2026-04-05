@@ -1,35 +1,47 @@
+import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 // import { ingredients } from '@utils/ingredients';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, useReducer } from 'react';
 
 import { AppHeader } from '@components/app-header/app-header';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
 
+import fetchHelper from '../../utils/fetch';
+
 import styles from './app.module.css';
 
 export const App = () => {
-  console.log('App'); //todo почему сходу 2 раза рендерит
-  const [ingredients, setIngredients] = useState([]);
-  console.log('ingredients');
-  console.log(ingredients);
+  const [order, setOrder] = useState([]);
+  const ingredientsRef = useRef([]);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const count = {};
+  order.forEach(function (item) {
+    count[item._id] = (count[item._id] || 0) + 1;
+  });
+
+  const handleAdd = useCallback((id) => {
+    const ingredient = ingredientsRef.current.find((item) => item._id === id);
+    setOrder((order) => [...order, ingredient]);
+  }, []);
+
+  const handleRemove = useCallback((index) => {
+    setOrder((order) => [...order.slice(0, index), ...order.slice(index + 1)]);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
 
-    console.log(import.meta.env);
-    fetch(import.meta.env.VITE_API_KEY + 'api/ingredients', {
-      signal,
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        //console.log(response.data);
-        setIngredients(response.data);
-      })
-      .catch((e) => console.error(e));
+    const fetchCallback = (data) => {
+      ingredientsRef.current = data;
+      forceUpdate();
+    };
+    fetchHelper({
+      url: import.meta.env.VITE_API_KEY + 'api/ingredients',
+      controller,
+      callback: fetchCallback,
+    });
 
     return () => {
-      console.log('cancel');
       // Отменяем запрос
       controller.abort({ reason: 'canceled on component unmount' });
     };
@@ -42,8 +54,23 @@ export const App = () => {
         Соберите бургер
       </h1>
       <main className={`${styles.main} pl-5 pr-5`}>
-        <BurgerIngredients ingredients={ingredients} />
-        <BurgerConstructor ingredients={ingredients} />
+        {ingredientsRef.current.length ? (
+          <>
+            <BurgerIngredients
+              ingredients={ingredientsRef.current}
+              handleAdd={handleAdd}
+              count={count}
+            />
+            <BurgerConstructor
+              ingredients={ingredientsRef.current}
+              handleRemove={handleRemove}
+              order={order}
+              setOrder={setOrder}
+            />
+          </>
+        ) : (
+          <Preloader />
+        )}
       </main>
     </div>
   );
