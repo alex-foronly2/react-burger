@@ -3,7 +3,6 @@ import {
   ConstructorElement,
   Button,
   CurrencyIcon,
-  CheckMarkIcon,
 } from '@krgaa/react-developer-burger-ui-components';
 import { Fragment, useState } from 'react';
 
@@ -129,13 +128,13 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
       {showModal && (
         <Modal onClose={closeModal}>
           <div className={styles.burger_constructor_popup}>
-            <div className="text text_type_digits-medium mt-30">123456</div>
+            <div className="text text_type_digits-medium mt-10">123456</div>
             <div className="mt-8 text text_type_main-medium">идентификатор заказа</div>
             <div className="mt-15 mb-15">
-              <CheckMarkIcon type="primary" />
+              <img src="/done.svg" />
             </div>
             <div className="text text_type_main-default">Ваш заказ начали готовить</div>
-            <div className="text text_type_main-default text_color_inactive mb-30 mt-2">
+            <div className="text text_type_main-default text_color_inactive mb-20 mt-2">
               Дождитесь готовности на орбитальной станции
             </div>
           </div>
