@@ -104,7 +104,7 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
                 <ConstructorElement
                   isLocked={true}
                   price={item.price}
-                  text={item.name}
+                  text={item.name + ' (верх)'}
                   thumbnail={item.image_mobile}
                   type="top"
                   extraClass="ml-10"
@@ -150,7 +150,7 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
                 <ConstructorElement
                   isLocked={true}
                   price={item.price}
-                  text={item.name}
+                  text={item.name + ' (низ)'}
                   thumbnail={item.image_mobile}
                   type="bottom"
                   extraClass="ml-10"
