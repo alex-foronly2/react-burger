@@ -38,14 +38,14 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
 
   const onDragEnd = function (e) {
     const draggedElement = e.target;
-    const oldIndex = draggedElement.dataset.index;
+    let oldIndex = draggedElement.dataset.index;
     let updateRequired = false;
     const tempOrder = [...order];
     const elements = document.querySelectorAll('.js-draggable');
     if (startDragY > e.clientY) {
       //если перетащили вверх
       for (let element of elements) {
-        const newIndex = element.dataset.index;
+        let newIndex = element.dataset.index;
         if (newIndex >= oldIndex) {
           break;
         }
@@ -53,6 +53,10 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
           element.getBoundingClientRect().top +
           element.getBoundingClientRect().height / 2;
         if (e.clientY < elementCenter) {
+          if (tempOrder[0].type === 'bun') {
+            ++oldIndex;
+            ++newIndex;
+          }
           const tempItem = tempOrder[oldIndex];
           tempOrder.splice(oldIndex, 1);
           tempOrder.splice(newIndex, 0, tempItem);
@@ -64,7 +68,7 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
       //если перетащили вниз
       for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
-        const newIndex = element.dataset.index;
+        let newIndex = element.dataset.index;
         if (newIndex <= oldIndex) {
           break;
         }
@@ -72,6 +76,10 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
           element.getBoundingClientRect().top +
           element.getBoundingClientRect().height / 2;
         if (e.clientY > elementCenter) {
+          if (tempOrder[0].type === 'bun') {
+            ++oldIndex;
+            ++newIndex;
+          }
           const tempItem = tempOrder[oldIndex];
           tempOrder.splice(oldIndex, 1);
           tempOrder.splice(newIndex, 0, tempItem);
@@ -86,31 +94,72 @@ export const BurgerConstructor = ({ order, setOrder, handleRemove }) => {
   };
 
   return (
-    <section className={`${styles.burger_constructor} custom-scroll mb-10`}>
-      {order.map((item, index) => {
-        return (
-          <Fragment key={index}>
-            <div
-              draggable={true}
-              className="js-draggable mb-4"
-              data-index={index}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-            >
-              <DragIcon type="primary" />
-              <ConstructorElement
-                handleClose={remove.bind({ index })}
-                isLocked={false}
-                price={item.price}
-                text={item.name}
-                thumbnail={item.image_mobile}
-                type="top"
-                extraClass="ml-6"
-              />
-            </div>
-          </Fragment>
-        );
-      })}
+    <section className={`${styles.burger_constructor} mb-10`}>
+      {order
+        .filter((item) => item.position === 'top')
+        .map((item, index) => {
+          return (
+            <Fragment key={index}>
+              <div draggable={false} className="mb-4">
+                <ConstructorElement
+                  isLocked={true}
+                  price={item.price}
+                  text={item.name}
+                  thumbnail={item.image_mobile}
+                  type="top"
+                  extraClass="ml-10"
+                />
+              </div>
+            </Fragment>
+          );
+        })}
+      <div className={`${styles.burger_constructor_scrollable} custom-scroll`}>
+        {order
+          .filter((item) => !item.position)
+          .map((item, index) => {
+            return (
+              <Fragment key={index}>
+                <div
+                  draggable={true}
+                  className="js-draggable mb-4"
+                  data-index={index}
+                  onDragStart={onDragStart}
+                  onDragEnd={onDragEnd}
+                >
+                  <DragIcon type="primary" />
+                  <ConstructorElement
+                    handleClose={remove.bind({ index })}
+                    isLocked={false}
+                    price={item.price}
+                    text={item.name}
+                    thumbnail={item.image_mobile}
+                    type="normal"
+                    extraClass="ml-4"
+                  />
+                </div>
+              </Fragment>
+            );
+          })}
+      </div>
+      {order
+        .filter((item) => item.position === 'bottom')
+        .map((item, index) => {
+          return (
+            <Fragment key={index}>
+              <div draggable={false} className="mb-4">
+                <ConstructorElement
+                  isLocked={true}
+                  price={item.price}
+                  text={item.name}
+                  thumbnail={item.image_mobile}
+                  type="bottom"
+                  extraClass="ml-10"
+                />
+              </div>
+            </Fragment>
+          );
+        })}
+
       {order.length > 0 && (
         <>
           <div className={`${styles.burger_constructor_payment} mt-6 mr-5`}>

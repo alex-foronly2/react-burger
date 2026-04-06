@@ -6,7 +6,7 @@ import { AppHeader } from '@components/app-header/app-header';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
 
-import fetchHelper from '../../utils/fetch';
+import request from '../../utils/request';
 
 import styles from './app.module.css';
 
@@ -21,7 +21,23 @@ export const App = () => {
 
   const handleAdd = useCallback((id) => {
     const ingredient = ingredientsRef.current.find((item) => item._id === id);
-    setOrder((order) => [...order, ingredient]);
+    setOrder((order) => {
+      let tempOrder;
+      //вставляем в конец или перед последней булкой
+      if (ingredient.type === 'bun') {
+        tempOrder = order.filter((item) => item.type !== 'bun');
+        tempOrder.unshift(Object.assign({ position: 'top' }, ingredient));
+        tempOrder.push(Object.assign({ position: 'bottom' }, ingredient));
+      } else {
+        tempOrder = order.filter(() => 1);
+        if (tempOrder.length && tempOrder[tempOrder.length - 1].type === 'bun') {
+          tempOrder.splice(-1, 0, ingredient);
+        } else {
+          tempOrder.push(ingredient);
+        }
+      }
+      return tempOrder;
+    });
   }, []);
 
   const handleRemove = useCallback((index) => {
@@ -35,8 +51,8 @@ export const App = () => {
       ingredientsRef.current = data;
       forceUpdate();
     };
-    fetchHelper({
-      url: import.meta.env.VITE_API_KEY + 'api/ingredients',
+    request({
+      endpoint: 'api/ingredients',
       controller,
       callback: fetchCallback,
     });
