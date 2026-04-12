@@ -15,3 +15,7 @@ body {
     scrollbar-width: thin;
   }
 }
+
+.c-pointer {
+  cursor: pointer;
+}
