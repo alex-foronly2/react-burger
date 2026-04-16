@@ -28,3 +28,9 @@
   flex-direction: column;
   align-items: center;
 }
+
+.burger_constructor-empty_ingredient {
+  display: flex;
+  justify-content: center;
+  max-height: 80px;
+}
