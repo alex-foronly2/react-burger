@@ -33,19 +33,3 @@
   line-height: 24px;
   text-align: center;
 }
-
-.burger_ingredient_info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.burger_ingredient_wide {
-  justify-content: space-around;
-}
-
-.burger_ingredient_item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}

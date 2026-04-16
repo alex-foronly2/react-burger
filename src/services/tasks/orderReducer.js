@@ -1,13 +1,20 @@
-import { ADD_ITEM, SORT_ITEMS, REMOVE_ITEM, SUBMIT_ORDER } from './actions.js';
+import {
+  ADD_ITEM,
+  SORT_ITEMS,
+  REMOVE_ITEM,
+  SUBMIT_ORDER,
+  COMPLETE_ORDER,
+} from './actions.js';
 
 const initialState = {
   orderBuns: [],
   orderIngredients: [],
+  isSending: false,
   submittedOrder: {},
 };
 
 export const orderReducer = (state = initialState, action) => {
-  let tempArray, tempItem;
+  let tempArray, tempItem, oldIndex;
   switch (action.type) {
     case ADD_ITEM:
       if (action.payload.type === 'bun') {
@@ -21,18 +28,20 @@ export const orderReducer = (state = initialState, action) => {
     case REMOVE_ITEM:
       return {
         ...state,
-        orderIngredients: [
-          ...state.orderIngredients.slice(0, action.payload),
-          ...state.orderIngredients.slice(action.payload + 1),
-        ],
+        orderIngredients: state.orderIngredients.filter(
+          (item) => item.uniqueId !== action.payload
+        ),
       };
     case SORT_ITEMS:
-      if (action.payload.oldIndex === action.payload.newIndex) {
+      oldIndex = state.orderIngredients.findIndex(
+        (item) => item.uniqueId === action.payload.uniqueId
+      );
+      if (oldIndex === -1 || oldIndex === action.payload.newIndex) {
         return state;
       }
       tempArray = [...state.orderIngredients];
-      tempItem = tempArray[action.payload.oldIndex];
-      tempArray.splice(action.payload.oldIndex, 1);
+      tempItem = tempArray[oldIndex];
+      tempArray.splice(oldIndex, 1);
       tempArray.splice(action.payload.newIndex, 0, tempItem);
       return {
         ...state,
@@ -41,6 +50,13 @@ export const orderReducer = (state = initialState, action) => {
     case SUBMIT_ORDER:
       return {
         ...state,
+        submittedOrder: {},
+        isSending: true,
+      };
+    case COMPLETE_ORDER:
+      return {
+        ...state,
+        isSending: false,
         submittedOrder: action.payload,
         orderIngredients: [],
         orderBuns: [],

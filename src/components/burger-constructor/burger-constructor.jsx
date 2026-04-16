@@ -6,9 +6,11 @@ import {
 import { Fragment } from 'react';
 import { useDrop } from 'react-dnd';
 import { useSelector, useDispatch } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 
 import { BurgerConstructorIngredient } from '@components/burger-constructor-ingredient/burger-constructor-ingredient';
 import Modal from '@components/modal/modal';
+import { OrderDetails } from '@components/order-details/order-details';
 import { useCreateOrderMutation } from '@services/api/orderApi';
 import {
   ADD_ITEM,
@@ -16,6 +18,7 @@ import {
   HIDE_POPUP,
   SHOW_POPUP,
   SUBMIT_ORDER,
+  COMPLETE_ORDER,
 } from '@services/tasks/actions';
 
 import styles from './burger-constructor.module.css';
@@ -29,7 +32,10 @@ export const BurgerConstructor = () => {
     drop(item) {
       dispatch({
         type: ADD_ITEM,
-        payload: item,
+        payload: {
+          ...item,
+          uniqueId: uuidv4(),
+        },
       });
     },
   });
@@ -40,8 +46,11 @@ export const BurgerConstructor = () => {
       const elements = document.querySelectorAll('.js-draggable');
       const droppedPosition = position.y;
       //если перетащили вверх
-      for (let i = 0; i < elements.length, i < item.index; i++) {
+      for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
+        if (element.uniqueId === item.uniqueId) {
+          break;
+        }
         const elementCenter =
           element.getBoundingClientRect().top +
           element.getBoundingClientRect().height / 2;
@@ -49,7 +58,7 @@ export const BurgerConstructor = () => {
           dispatch({
             type: SORT_ITEMS,
             payload: {
-              oldIndex: item.index,
+              uniqueId: item.uniqueId,
               newIndex: i,
             },
           });
@@ -57,8 +66,11 @@ export const BurgerConstructor = () => {
         }
       }
       //если перетащили вниз
-      for (let i = elements.length - 1; i >= 0, i > item.index; i--) {
+      for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
+        if (element.uniqueId === item.uniqueId) {
+          break;
+        }
         const elementCenter =
           element.getBoundingClientRect().top +
           element.getBoundingClientRect().height / 2;
@@ -66,7 +78,7 @@ export const BurgerConstructor = () => {
           dispatch({
             type: SORT_ITEMS,
             payload: {
-              oldIndex: item.index,
+              uniqueId: item.uniqueId,
               newIndex: i,
             },
           });
@@ -79,7 +91,6 @@ export const BurgerConstructor = () => {
   const orderBuns = useSelector((store) => store.order.orderBuns);
   const orderIngredients = useSelector((store) => store.order.orderIngredients);
   const order = [...orderBuns, ...orderIngredients];
-  const submittedOrder = useSelector((store) => store.order.submittedOrder);
   const total = order.reduce(
     (accumulator, currentValue) => accumulator + currentValue.price,
     0
@@ -96,6 +107,13 @@ export const BurgerConstructor = () => {
       alert('Выберите булки и состав бургера');
       return;
     }
+    dispatch({
+      type: SUBMIT_ORDER,
+    });
+    dispatch({
+      type: SHOW_POPUP,
+      payload: { type: 'order' },
+    });
     const request = {
       ingredients: [
         orderBuns[0]._id,
@@ -103,22 +121,15 @@ export const BurgerConstructor = () => {
         orderBuns[0]._id,
       ],
     };
-    try {
-      const result = await createOrder(request);
-      dispatch({
-        type: SUBMIT_ORDER,
-        payload: result.data,
-      });
-      dispatch({
-        type: SHOW_POPUP,
-        payload: { type: 'order' },
-      });
-    } catch (err) {
-      console.error('Error creating post:', err);
-    }
+    const result = await createOrder(request);
+    dispatch({
+      type: COMPLETE_ORDER,
+      payload: result.data,
+    });
   };
 
   const bun = orderBuns[0];
+  const isButtonDisabled = !orderBuns.length || !orderIngredients.length;
 
   return (
     <section className={`${styles.burger_constructor} mb-10`} ref={dropTarget}>
@@ -147,8 +158,8 @@ export const BurgerConstructor = () => {
         ref={dropSortTarget}
       >
         {orderIngredients.length ? (
-          orderIngredients.map((item, index) => {
-            return <BurgerConstructorIngredient index={index} {...item} key={index} />;
+          orderIngredients.map((item) => {
+            return <BurgerConstructorIngredient key={item.uniqueId} {...item} />;
           })
         ) : (
           <div
@@ -186,7 +197,12 @@ export const BurgerConstructor = () => {
               <CurrencyIcon type="primary" className="ml-2" />
             </div>
 
-            <Button onClick={placeAnOrder} size="small" type="primary">
+            <Button
+              disabled={isButtonDisabled}
+              onClick={placeAnOrder}
+              size="large"
+              type="primary"
+            >
               Оформить заказ
             </Button>
           </div>
@@ -194,19 +210,7 @@ export const BurgerConstructor = () => {
       }
       {showModal && (
         <Modal onClose={closeModal}>
-          <div className={styles.burger_constructor_popup}>
-            <div className="text text_type_digits-medium mt-10">
-              {submittedOrder.order.number}
-            </div>
-            <div className="mt-8 text text_type_main-medium">идентификатор заказа</div>
-            <div className="mt-15 mb-15">
-              <img src="/done.svg" />
-            </div>
-            <div className="text text_type_main-default">Ваш заказ начали готовить</div>
-            <div className="text text_type_main-default text_color_inactive mb-20 mt-2">
-              Дождитесь готовности на орбитальной станции
-            </div>
-          </div>
+          <OrderDetails />
         </Modal>
       )}
     </section>
