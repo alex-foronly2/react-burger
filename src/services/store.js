@@ -10,6 +10,10 @@ export const rootReducer = combineSlices(ingredientsApi, orderApi, {
   modal: modalReducer,
 });
 
+export const store = configureStore({
+  reducer: rootReducer,
+});
+
 export const configureStore = () => {
   return createStore({
     reducer: rootReducer,
