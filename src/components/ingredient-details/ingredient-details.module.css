@@ -1,0 +1,22 @@
+.burger_ingredient_info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.burger_ingredient_wide {
+  justify-content: space-around;
+}
+
+.burger_ingredient_item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.burger_ingredient_info img {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}

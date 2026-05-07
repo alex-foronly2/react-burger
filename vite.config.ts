@@ -27,5 +27,6 @@ export default defineConfig({
   },
   server: {
     open: true,
+    port: 15173
   },
 });

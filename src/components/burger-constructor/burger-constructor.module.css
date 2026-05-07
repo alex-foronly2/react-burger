@@ -23,8 +23,8 @@
   height: 40px;
 }
 
-.burger_constructor_popup {
+.burger_constructor-empty_ingredient {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  max-height: 80px;
 }
