@@ -7,7 +7,6 @@
 }
 
 .burger_ingredients_content {
-  max-height: 700px;
   overflow-y: scroll;
 }
 
