@@ -1,16 +1,18 @@
 import { Button } from '@krgaa/react-developer-burger-ui-components';
 import { memo } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useGetIngredientsQuery } from '@services/api/ingredientsApi';
-import { ADD_ITEM, HIDE_POPUP } from '@services/tasks/actions';
+import { ADD_ITEM } from '@services/tasks/actions';
 
 import styles from './ingredient-details.module.css';
 
 const IngredientDetailsBody = (props) => {
   const { data: ingredients } = useGetIngredientsQuery();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleAddButtonClick = () => {
     const chosenIngredient = ingredients.find((item) => item._id === props._id);
@@ -21,9 +23,7 @@ const IngredientDetailsBody = (props) => {
         uniqueId: uuidv4(),
       },
     });
-    dispatch({
-      type: HIDE_POPUP,
-    });
+    navigate('/');
   };
 
   return (
@@ -56,16 +56,18 @@ const IngredientDetailsBody = (props) => {
           <span className="text_type_digits-default">{props.carbohydrates}</span>
         </div>
       </div>
-      <div className={styles.burger_ingredient_info}>
-        <Button
-          onClick={handleAddButtonClick}
-          size="small"
-          type="primary"
-          extraClass="mt-8 mb-15"
-        >
-          Добавить
-        </Button>
-      </div>
+      {!props.hideButton && (
+        <div className={styles.burger_ingredient_info}>
+          <Button
+            onClick={handleAddButtonClick}
+            size="small"
+            type="primary"
+            extraClass="mt-8 mb-15"
+          >
+            Добавить
+          </Button>
+        </div>
+      )}
     </>
   );
 };

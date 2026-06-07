@@ -18,6 +18,7 @@
   display: block;
   justify-content: flex-end;
   align-items: center;
+  color: var(--text-primary-color);
   font-weight: 400;
   font-size: 28px;
   font-style: normal;
@@ -30,6 +31,7 @@
   display: block;
   flex-grow: 1;
   align-items: center;
+  color: var(--text-primary-color);
   line-height: 24px;
   text-align: center;
 }

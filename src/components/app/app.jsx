@@ -1,25 +1,81 @@
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
+import {
+  Home,
+  NotFound,
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  ProfilePage,
+  ProfileLayout,
+  Orders,
+  Layout,
+  IngredientModal,
+} from '@/pages';
+import { ProtectedRoute } from '@components/protected-route';
 
-import styles from './app.module.css';
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        path: '/',
+        element: <Home />,
+        // loader: async () => ({ ingredientsData: loadIngredients() }),
+        children: [
+          {
+            path: '/ingredients',
+            // element: <BurgerIngredient />,
+            element: <IngredientModal />,
+            children: [
+              {
+                path: ':ingredientId',
+                element: <IngredientModal />,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        path: '/login',
+        element: <ProtectedRoute onlyUnAuth component={<LoginPage />} />,
+      },
+      {
+        path: '/register',
+        element: <ProtectedRoute onlyUnAuth component={<RegisterPage />} />,
+      },
+      {
+        path: '/forgot-password',
+        element: <ProtectedRoute onlyUnAuth component={<ForgotPasswordPage />} />,
+      },
+      {
+        path: '/reset-password',
+        element: <ProtectedRoute onlyUnAuth component={<ResetPasswordPage />} />,
+      },
+      {
+        path: '/profile',
+        element: <ProtectedRoute component={<ProfileLayout />} />,
+        children: [
+          {
+            path: '/profile',
+            element: <ProfilePage />,
+          },
+          {
+            path: 'orders',
+            element: <Orders />,
+          },
+        ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
+      },
+    ],
+  },
+]);
 
-export const App = () => {
-  return (
-    <div className={styles.app}>
-      <AppHeader />
-      <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-        Соберите бургер
-      </h1>
-      <main className={`${styles.main} pl-5 pr-5`}>
-        <DndProvider backend={HTML5Backend}>
-          <BurgerIngredients />
-          <BurgerConstructor />
-        </DndProvider>
-      </main>
-    </div>
-  );
-};
+export function App() {
+  return <RouterProvider router={router} />;
+}
