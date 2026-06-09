@@ -1,0 +1,38 @@
+.profile {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.left {
+  display: flex;
+  flex-basis: 35%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.menu ul {
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu a {
+  text-decoration: none;
+}
+
+.menuItem {
+  color: var(--text-inactive-color);
+}
+
+.activeMenuItem {
+  color: var(--text-primary-color);
+}
+
+.info {
+  color: #31313f;
+}

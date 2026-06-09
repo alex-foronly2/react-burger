@@ -6,6 +6,7 @@ import {
 import { Fragment } from 'react';
 import { useDrop } from 'react-dnd';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BurgerConstructorIngredient } from '@components/burger-constructor-ingredient/burger-constructor-ingredient';
@@ -20,6 +21,7 @@ import {
   SUBMIT_ORDER,
   COMPLETE_ORDER,
 } from '@services/tasks/actions';
+import { userSelector } from '@services/user/slice';
 
 import styles from './burger-constructor.module.css';
 
@@ -27,6 +29,9 @@ export const BurgerConstructor = () => {
   const dispatch = useDispatch();
   const showModal = useSelector((store) => store.modal.order);
   const [createOrder] = useCreateOrderMutation();
+  const user = useSelector(userSelector);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [, dropTarget] = useDrop({
     accept: 'ingredient',
     drop(item) {
@@ -103,6 +108,13 @@ export const BurgerConstructor = () => {
   };
 
   const placeAnOrder = async () => {
+    if (!user) {
+      return navigate('/login', {
+        state: {
+          from: location,
+        },
+      });
+    }
     if (!orderBuns.length || !orderIngredients.length) {
       alert('Выберите булки и состав бургера');
       return;
