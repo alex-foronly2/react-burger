@@ -1,10 +1,13 @@
 import { Preloader, Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, Fragment, useRef, memo } from 'react';
-import { useSelector } from 'react-redux';
 import { Link, Outlet } from 'react-router-dom';
 
+import { useAppSelector } from '@/hooks/hooks';
 import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredient';
-import { useGetIngredientsQuery } from '@services/api/ingredientsApi';
+import {
+  useGetIngredientsQuery,
+  type ingredientType,
+} from '@services/api/ingredientsApi';
 
 import type { RefObject, JSX } from 'react';
 
@@ -23,14 +26,14 @@ const BurgerIngredientsBody = (): JSX.Element => {
   const handleScroll = function (): void {
     let closestTab = activeTab;
     let shortestDistance = Math.abs(
-      refs[closestTab]?.current?.getBoundingClientRect().top -
-        navRef?.current?.getBoundingClientRect().top
+      (refs[closestTab]?.current?.getBoundingClientRect().top ?? 0) -
+        (navRef?.current?.getBoundingClientRect().top ?? 0)
     );
     for (const type of types) {
       if (type.type !== activeTab) {
         const currentDistance = Math.abs(
-          refs[type.type].current.getBoundingClientRect().top -
-            navRef?.current?.getBoundingClientRect().top
+          (refs[type.type]?.current?.getBoundingClientRect().top ?? 0) -
+            (navRef?.current?.getBoundingClientRect().top ?? 0)
         );
         if (currentDistance < shortestDistance) {
           shortestDistance = currentDistance;
@@ -48,23 +51,27 @@ const BurgerIngredientsBody = (): JSX.Element => {
     { type: 'main', name: 'Начинки' },
     { type: 'sauce', name: 'Соусы' },
   ];
-  const refs: Record<Tab, RefObject<HTMLDivElement | null>> = {};
-  refs['bun'] = useRef(null);
-  refs['main'] = useRef(null);
-  refs['sauce'] = useRef(null);
+  const refs: Record<Tab, RefObject<HTMLDivElement | null>> = {
+    bun: useRef(null),
+    main: useRef(null),
+    sauce: useRef(null),
+  };
+  // refs['bun'] = useRef(null);
+  // refs['main'] = useRef(null);
+  // refs['sauce'] = useRef(null);
   const navRef: RefObject<HTMLDivElement | null> = useRef(null);
 
-  const currentOrder = useSelector((store) => [
+  const currentOrder = useAppSelector((store) => [
     ...store.order.orderBuns,
     ...store.order.orderIngredients,
   ]);
-  const count = {};
-  currentOrder.forEach(function (item) {
+  const count: Record<string, number> = {};
+  currentOrder.forEach(function (item: ingredientType) {
     count[item._id] = (count[item._id] || 0) + 1;
   });
 
-  if (error) {
-    return error.error;
+  if (error && 'error' in error) {
+    return <>error.error</>;
   }
   if (isLoading) {
     return <Preloader />;
@@ -98,21 +105,22 @@ const BurgerIngredientsBody = (): JSX.Element => {
             <h2 className="text text_type_main-medium mt-10 mb-6" ref={refs[type.type]}>
               {type.name}
             </h2>
-            {ingredients
-              .filter((ingredients) => ingredients.type === type.type)
-              .map((ingredient) => (
-                <Link
-                  key={ingredient._id}
-                  to={{ pathname: `/ingredients/${ingredient._id}` }}
-                  state={{ fromClick: true }}
-                >
-                  <BurgerIngredient
-                    ingredient={ingredient}
+            {ingredients &&
+              ingredients
+                .filter((ingredients) => ingredients.type === type.type)
+                .map((ingredient) => (
+                  <Link
                     key={ingredient._id}
-                    count={count[ingredient._id] || 0}
-                  />
-                </Link>
-              ))}
+                    to={{ pathname: `/ingredients/${ingredient._id}` }}
+                    state={{ fromClick: true }}
+                  >
+                    <BurgerIngredient
+                      ingredient={ingredient}
+                      key={ingredient._id}
+                      count={count[ingredient._id] || 0}
+                    />
+                  </Link>
+                ))}
           </Fragment>
         ))}
       </div>

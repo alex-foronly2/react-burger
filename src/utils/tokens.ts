@@ -3,7 +3,7 @@ const baseUrl = import.meta.env.VITE_API_KEY;
 export async function fetchWithRefresh(
   endpoint: string,
   options: RequestInit
-): Promise<T> {
+): Promise<Response> {
   const response = await fetch(endpoint, options);
   if (response.ok) return response;
 

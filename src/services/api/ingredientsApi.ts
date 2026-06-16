@@ -7,6 +7,7 @@ const API_HEADERS = {
 };
 
 const baseUrl = import.meta.env.VITE_API_KEY;
+export type ingredientType = Omit<Bun | Filling, 'uniqueId'>;
 
 export const ingredientsApi = createApi({
   reducerPath: 'ingredientsApi',
@@ -19,12 +20,11 @@ export const ingredientsApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getIngredients: builder.query({
+    getIngredients: builder.query<ingredientType[], void>({
       query: () => ({
         url: '/api/ingredients',
-        responseHandler: async (
-          response
-        ): Promise<{ success: boolean; data: Omit<Bun | Filling, 'uniqueId'>[] }> => {
+        responseHandler: async (response): Promise<ingredientType[]> => {
+          //{ success: boolean; data:
           console.log(response);
           const json = await response.json();
           return json.data;

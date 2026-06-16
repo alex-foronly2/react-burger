@@ -9,7 +9,7 @@ import type { JSX, PropsWithChildren } from 'react';
 import styles from './modal.module.css';
 
 type ModalProps = {
-  header: string;
+  header?: string;
   onClose: () => void;
 };
 function Modal({
@@ -17,9 +17,9 @@ function Modal({
   header,
   onClose,
 }: PropsWithChildren<ModalProps>): JSX.Element {
-  const modalRoot = document.getElementById('modal');
+  const modalRoot = document.getElementById('modal')!;
   useEffect(() => {
-    function handleEscape(event): void {
+    function handleEscape(event: KeyboardEvent): void {
       if (event.key === 'Escape') {
         onClose();
       }

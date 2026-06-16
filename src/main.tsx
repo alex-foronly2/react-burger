@@ -10,7 +10,7 @@ import './index.css';
 
 // const store = configureStore();
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <App />

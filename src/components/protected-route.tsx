@@ -6,7 +6,7 @@ import { userSelector } from '@services/user/slice.js';
 import type { JSX } from 'react';
 
 type ProtectedRouteProps = {
-  onlyUnAuth: boolean;
+  onlyUnAuth?: boolean;
   component: JSX.Element;
 };
 

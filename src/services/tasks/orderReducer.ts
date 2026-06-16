@@ -64,51 +64,61 @@ export const orderReducer = (
 ): OrderInterface => {
   let tempArray, tempItem, oldIndex;
   switch (action.type) {
-    case ADD_ITEM:
-      if (action?.payload?.type === 'bun') {
-        return { ...state, orderBuns: [action?.payload, action?.payload] };
+    case ADD_ITEM: {
+      const addedItemPayload = (action as PayloadAction<Bun | Filling>).payload;
+      if (addedItemPayload.type === 'bun') {
+        return { ...state, orderBuns: [addedItemPayload, addedItemPayload] };
       } else {
         return {
           ...state,
-          orderIngredients: [...state.orderIngredients, action?.payload],
+          orderIngredients: [...state.orderIngredients, addedItemPayload],
         };
       }
-    case REMOVE_ITEM:
+    }
+    case REMOVE_ITEM: {
+      const removedItemPayload = (action as PayloadAction<string>).payload;
       return {
         ...state,
         orderIngredients: state.orderIngredients.filter(
-          (item) => item.uniqueId !== action?.payload
+          (item) => item.uniqueId !== removedItemPayload
         ),
       };
-    case SORT_ITEMS:
+    }
+    case SORT_ITEMS: {
+      const sortedItemPayload = (
+        action as PayloadAction<{ uniqueId: string; newIndex: number }>
+      ).payload;
       oldIndex = state.orderIngredients.findIndex(
-        (item) => item.uniqueId === action?.payload?.uniqueId
+        (item) => item.uniqueId === sortedItemPayload.uniqueId
       );
-      if (oldIndex === -1 || oldIndex === action?.payload?.newIndex) {
+      if (oldIndex === -1 || oldIndex === sortedItemPayload.newIndex) {
         return state;
       }
       tempArray = [...state.orderIngredients];
       tempItem = tempArray[oldIndex];
       tempArray.splice(oldIndex, 1);
-      tempArray.splice(action?.payload?.newIndex, 0, tempItem);
+      tempArray.splice(sortedItemPayload.newIndex, 0, tempItem);
       return {
         ...state,
         orderIngredients: tempArray,
       };
+    }
     case SUBMIT_ORDER:
       return {
         ...state,
         submittedOrder: {},
         isSending: true,
       };
-    case COMPLETE_ORDER:
+    case COMPLETE_ORDER: {
+      const completedOrderPayload = (action as PayloadAction<Order>).payload;
       return {
         ...state,
         isSending: false,
-        submittedOrder: action?.payload,
+        submittedOrder: completedOrderPayload,
         orderIngredients: [],
         orderBuns: [],
       };
+    }
     default:
       return state;
   }

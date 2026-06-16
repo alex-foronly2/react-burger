@@ -1,9 +1,10 @@
 import { Button, Input } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
+import { useAppSelector } from '@/hooks/hooks';
 import { useFormWithValidation } from '@hooks/use-form-with-validation';
-import { useUpdateUserMutation } from '@services/api/authApi';
+import { useUpdateUserMutation, type BackendErrorData } from '@services/api/authApi';
 import {
   setUserFormValue,
   userSelector,
@@ -12,10 +13,12 @@ import {
 } from '@services/user/slice';
 import { userFormValidators } from '@utils/formValidators';
 
-import type { JSX } from 'react';
+import type { SerializedError } from '@reduxjs/toolkit';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import type { FormEvent, JSX } from 'react';
 
 export const ProfilePage = (): JSX.Element => {
-  const user = useSelector(userSelector);
+  const user = useAppSelector(userSelector);
   const dispatch = useDispatch();
   const [showError, setShowError] = useState('');
   const [updateUser, { error: backendError }] = useUpdateUserMutation();
@@ -27,7 +30,7 @@ export const ProfilePage = (): JSX.Element => {
     setUserFormValue,
     userFormValidators
   );
-  function handleSubmit(e): void | boolean {
+  function handleSubmit(e: FormEvent<HTMLFormElement>): void | boolean {
     e.preventDefault();
     setShowError('');
     if (errors) {
@@ -42,12 +45,22 @@ export const ProfilePage = (): JSX.Element => {
 
     updateUser(values);
   }
-  function resetForm(e): void {
-    e.preventDefault();
+  function resetForm(): void {
     dispatch(initUserForm());
   }
   const dataChanged =
-    values.name !== user.name || values.email !== user.email || values.password;
+    user &&
+    (values.name !== user.name || values.email !== user.email || values.password);
+  let backendErrorMessage = '';
+  if (backendError) {
+    const rtkError = backendError as FetchBaseQueryError | SerializedError;
+
+    if ('data' in rtkError) {
+      backendErrorMessage = (rtkError.data as BackendErrorData)?.message || '';
+    } else if ('message' in rtkError) {
+      backendErrorMessage = rtkError.message || '';
+    }
+  }
   return (
     <form noValidate onSubmit={handleSubmit}>
       <Input
@@ -56,9 +69,9 @@ export const ProfilePage = (): JSX.Element => {
         name="name"
         type="text"
         disabled={false}
-        value={values ? values.name : ''}
-        errorText={errors.name || backendError?.message || backendError?.data?.message}
-        error={backendError || showError === 'name'}
+        value={values ? String(values.name) : ''}
+        errorText={errors.name || backendErrorMessage}
+        error={!!(backendError || showError === 'name')}
         icon={'EditIcon'}
         extraClass="mb-6"
       />
@@ -68,7 +81,7 @@ export const ProfilePage = (): JSX.Element => {
         name="email"
         type="email"
         disabled={false}
-        value={values ? values.email : ''}
+        value={values ? String(values.email) : ''}
         errorText={errors.email}
         error={showError === 'email'}
         icon={'EditIcon'}
@@ -80,7 +93,7 @@ export const ProfilePage = (): JSX.Element => {
         name="password"
         type="password"
         disabled={false}
-        value={values ? values.password : '*******'}
+        value={values ? String(values.password) : '*******'}
         errorText={errors.password}
         error={showError === 'password'}
         // value={'******'}
@@ -90,7 +103,8 @@ export const ProfilePage = (): JSX.Element => {
       {dataChanged && (
         <>
           <Button
-            onClick={handleSubmit}
+            // onClick={handleSubmit}
+            htmlType="submit"
             size="small"
             type="primary"
             extraClass="mt-8 mb-15"
@@ -99,6 +113,7 @@ export const ProfilePage = (): JSX.Element => {
           </Button>
           <Button
             onClick={resetForm}
+            htmlType="button"
             size="small"
             type="primary"
             extraClass="ml-4 mt-8 mb-15"

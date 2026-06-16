@@ -16,6 +16,7 @@ export const orderApi = createApi({
       }
     },
   }),
+  tagTypes: ['ORDER'],
   endpoints: (builder) => ({
     createOrder: builder.mutation({
       query: (data) => ({

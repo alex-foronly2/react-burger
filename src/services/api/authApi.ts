@@ -7,12 +7,16 @@ const API_HEADERS = {
 };
 
 const baseUrl = import.meta.env.VITE_API_KEY;
+type queryArgs = {
+  url: string;
+  method?: string;
+};
 
-async function baseQueryWithRefresh(args): Promise<T> {
+async function baseQueryWithRefresh<T>(args: queryArgs): Promise<{ data: T }> {
   const { url, method = 'GET', ...rest } = args;
   const token = localStorage.getItem('accessToken');
 
-  const headers = {};
+  const headers: Record<string, string> = {};
   for (const [key, value] of Object.entries(API_HEADERS)) {
     headers[key] = value;
   }
@@ -95,7 +99,7 @@ export const authApi = createApi({
         if (!data.success) {
           return null;
         }
-        localStorage.setItem('resetSent', true);
+        localStorage.setItem('resetSent', '1');
         return data;
       },
     }),
@@ -142,3 +146,7 @@ export const {
   useResetPasswordMutation,
   useUpdatePasswordMutation,
 } = authApi;
+
+export type BackendErrorData = {
+  message?: string;
+};

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { useAppDispatch } from '@hooks/hooks';
 
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import type { ChangeEvent } from 'react';
 
 import type { RootState } from '@services/store';
@@ -23,11 +24,11 @@ type Validator = {
 type ValidatorsMap = Record<string, Validator>;
 
 // Интерфейс для функции setFormValue (действие Redux)
-type SetFormValueAction = {
+type SetFormValuePayload = {
   field: string;
   value: string | number | boolean | null;
 };
-type SetFormValueFunction = (payload: SetFormValueAction) => SetFormValueAction;
+type SetFormValueFunction = ActionCreatorWithPayload<SetFormValuePayload>;
 
 // Полный интерфейс для хука
 type UseFormWithValidationResult = {
@@ -45,15 +46,11 @@ export function useFormWithValidation(
   const values = useSelector(selector);
   const [errors, setErrors] = useState(initErrors(values));
   const [isValid, setIsValid] = useState(false);
-  // const dispatch = useDispatch();
   const dispatch = useAppDispatch();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
-    const input = event.target as HTMLInputElement;
-    // if (input instanceof HTMLInputElement) {
+    const input = event.currentTarget;
     const value = input.value;
-    // console.log('value');
-    // console.log(value);
     const name = input.name;
     const isValid = validators[name]?.validator(value) ?? true;
     dispatch(setFormValue({ field: name, value }));
@@ -62,7 +59,6 @@ export function useFormWithValidation(
       [name]: !isValid ? validators[name]?.message : '',
     });
     setIsValid(isValid);
-    // }
   }
 
   return { values, handleChange, errors, isValid };
@@ -70,8 +66,8 @@ export function useFormWithValidation(
 
 // Функция initError создаёт объект с такими же ключами, как у того,
 // с которым работает хук, но с пустыми строками в значениях
-function initErrors(formValues): ValidationErrors {
-  return Object.keys(formValues).reduce((errorObject, fieldName) => {
+function initErrors(formValues: FormValues): ValidationErrors {
+  return Object.keys(formValues).reduce<ValidationErrors>((errorObject, fieldName) => {
     errorObject[fieldName] = '';
     return errorObject;
   }, {});

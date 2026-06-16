@@ -5,7 +5,7 @@ import { authApi } from '../api/authApi.js';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 const defaultUser = localStorage.getItem('user')
-  ? JSON.parse(localStorage.getItem('user'))
+  ? JSON.parse(localStorage.getItem('user') ?? '')
   : null;
 
 type User = {
@@ -25,11 +25,13 @@ type Error = {
   };
 };
 
+type Form = {
+  email: string;
+  password: string;
+};
+
 type SliceState = {
-  form: {
-    email: string;
-    password: string;
-  };
+  form: Form;
   user: User | null;
   userForm: User;
   passwordForm: Password;
@@ -55,17 +57,39 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setFormValue: (state, action) => {
-      state.form[action.payload.field] = action.payload.value;
+    setFormValue: (
+      state,
+      action: PayloadAction<{ field: string; value: string | number | boolean | null }>
+    ) => {
+      const formStringValue =
+        action.payload.value !== null && action.payload.value !== undefined
+          ? String(action.payload.value)
+          : '';
+      state.form[action.payload.field as keyof Form] = formStringValue;
     },
-    setUserFormValue: (state, action) => {
-      state.userForm[action.payload.field] = action.payload.value;
+    setUserFormValue: (
+      state,
+      action: PayloadAction<{ field: string; value: string | number | boolean | null }>
+    ) => {
+      const userFormStringValue =
+        action.payload.value !== null && action.payload.value !== undefined
+          ? String(action.payload.value)
+          : '';
+      state.userForm[action.payload.field as keyof User] = userFormStringValue;
     },
-    setPasswordFormValue: (state, action) => {
-      state.passwordForm[action.payload.field] = action.payload.value;
+    setPasswordFormValue: (
+      state,
+      action: PayloadAction<{ field: string; value: string | number | boolean | null }>
+    ) => {
+      const passwordFormStringValue =
+        action.payload.value !== null && action.payload.value !== undefined
+          ? String(action.payload.value)
+          : '';
+      state.passwordForm[action.payload.field as keyof Password] =
+        passwordFormStringValue;
     },
     initUserForm: (state) => {
-      state.userForm = state.user;
+      state.userForm = state.user ?? {};
       state.userForm.password = '';
     },
     setIsAuthChecked: (state, action) => {
@@ -79,6 +103,7 @@ export const authSlice = createSlice({
     authSelector: (state) => state.form,
     userSelector: (state) => state.user,
     userFormSelector: (state) => state.userForm,
+    passwordFormSelector: (state) => state.passwordForm,
     isAuthCheckedSelector: (state) => state.isAuthChecked,
     sendingSelector: (state) => state.sending,
     sendErrorSelector: (state) => state.error,
@@ -100,7 +125,8 @@ export const authSlice = createSlice({
         }
       )
       .addMatcher(authApi.endpoints.logout.matchFulfilled, (state) => {
-        state.user = state.userForm = null;
+        state.user = null;
+        state.userForm = {};
         state.isAuthChecked = true;
       })
       .addMatcher(
@@ -123,4 +149,5 @@ export const {
   isAuthCheckedSelector,
   userSelector,
   userFormSelector,
+  passwordFormSelector,
 } = authSlice.selectors;

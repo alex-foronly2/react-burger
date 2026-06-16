@@ -4,5 +4,6 @@ import type { RootState, AppDispatch } from '@services/store';
 
 // export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 // export const useAppDispatch = useDispatch<AppDispatch>();
-export const useAppDispatch: AppDispatch = () => useDispatch<AppDispatch>();
+// export const useAppDispatch: AppDispatch = () => useDispatch<AppDispatch>();
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();

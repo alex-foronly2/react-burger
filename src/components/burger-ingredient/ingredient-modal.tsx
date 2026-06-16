@@ -7,23 +7,37 @@ import Modal from '@components/modal/modal';
 import { useGetIngredientsQuery } from '@services/api/ingredientsApi';
 
 // import {CurrencyIcon, Counter, Preloader} from '@krgaa/react-developer-burger-ui-components';
-import type { JSX } from 'react';
+import type { JSX, SyntheticEvent } from 'react';
+
+import type { ingredientType } from '@services/api/ingredientsApi';
+// import type { Bun, Filling } from '@/services/tasks/orderReducer';
 
 const BurgerIngredientBody = (): JSX.Element => {
-  const { showPopup } = useOutletContext();
+  type MyOutletContext = {
+    showPopup: boolean;
+  };
+  const { showPopup } = useOutletContext<MyOutletContext>();
   const { ingredientId } = useParams();
   const navigate = useNavigate();
   const { isLoading, error, data: ingredients } = useGetIngredientsQuery();
   if (isLoading) {
     return <Preloader />;
   }
-  if (error) {
-    return error.error;
+  if (error && 'error' in error) {
+    return <>error.error</>;
   }
-  const ingredient = ingredients.find((ingredient) => ingredient._id === ingredientId);
+  if (!ingredients) {
+    return <></>;
+  }
+  const ingredient = ingredients.find(
+    (ingredient: ingredientType) => ingredient._id === ingredientId
+  );
+  if (!ingredient) {
+    return <></>;
+  }
 
   //if no history redirect
-  const closeModal = (e): void => {
+  const closeModal = (e?: SyntheticEvent): void => {
     if (e) {
       e.stopPropagation();
     }

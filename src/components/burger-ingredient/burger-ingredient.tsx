@@ -4,12 +4,12 @@ import { useDrag } from 'react-dnd';
 
 import type { JSX } from 'react';
 
-import type { Bun, Filling } from '@services/tasks/orderReducer';
+import type { ingredientType } from '@/services/api/ingredientsApi';
 
 import styles from './burger-ingredient.module.css';
 
 type BurgerIngredientInterface = {
-  ingredient: Bun | Filling;
+  ingredient: ingredientType;
   count: number;
 };
 
@@ -21,7 +21,12 @@ const BurgerIngredientBody = (props: BurgerIngredientInterface): JSX.Element => 
 
   return (
     <>
-      <div className={styles.burger_ingredient} ref={dragRef}>
+      <div
+        className={styles.burger_ingredient}
+        ref={(node) => {
+          dragRef(node);
+        }}
+      >
         {props.count > 0 && <Counter count={props.count} size="default" />}
         <img
           className="pl-4 pr-4"

@@ -9,17 +9,25 @@ import { ADD_ITEM } from '@services/tasks/actions';
 
 import type { JSX } from 'react';
 
-import type { Bun, Filling } from '@services/tasks/orderReducer';
+import type { ingredientType } from '@services/api/ingredientsApi';
 
+// import type { Bun, Filling } from '@services/tasks/orderReducer';
 import styles from './ingredient-details.module.css';
 
-const IngredientDetailsBody = (props: Bun | Filling): JSX.Element => {
+const IngredientDetailsBody = (
+  props: ingredientType & { hideButton?: boolean }
+): JSX.Element => {
   const { data: ingredients } = useGetIngredientsQuery();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleAddButtonClick = (): void => {
-    const chosenIngredient = ingredients.find((item) => item._id === props._id);
+    if (!ingredients) {
+      return;
+    }
+    const chosenIngredient = ingredients.find(
+      (item: ingredientType) => item._id === props._id
+    );
     dispatch({
       type: ADD_ITEM,
       payload: {
@@ -66,6 +74,7 @@ const IngredientDetailsBody = (props: Bun | Filling): JSX.Element => {
             onClick={handleAddButtonClick}
             size="small"
             type="primary"
+            htmlType="button"
             extraClass="mt-8 mb-15"
           >
             Добавить

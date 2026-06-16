@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
+import { useAppSelector } from '@/hooks/hooks';
 import { BurgerConstructorIngredient } from '@components/burger-constructor-ingredient/burger-constructor-ingredient';
 import Modal from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
@@ -25,18 +26,20 @@ import { userSelector } from '@services/user/slice';
 
 import type { JSX } from 'react';
 
+import type { Filling } from '@services/tasks/orderReducer';
+
 import styles from './burger-constructor.module.css';
 
 export const BurgerConstructor = (): JSX.Element => {
   const dispatch = useDispatch();
-  const showModal = useSelector((store) => store.modal.order);
+  const showModal = useAppSelector((store) => store.modal.order);
   const [createOrder] = useCreateOrderMutation();
   const user = useSelector(userSelector);
   const navigate = useNavigate();
   const location = useLocation();
   const [, dropTarget] = useDrop({
     accept: 'ingredient',
-    drop(item) {
+    drop(item: Filling) {
       dispatch({
         type: ADD_ITEM,
         payload: {
@@ -48,14 +51,17 @@ export const BurgerConstructor = (): JSX.Element => {
   });
   const [, dropSortTarget] = useDrop({
     accept: 'orderItem',
-    drop(item, monitor) {
+    drop(item: Filling, monitor) {
       const position = monitor.getClientOffset();
-      const elements = document.querySelectorAll('.js-draggable');
+      if (!position) {
+        return;
+      }
+      const elements = document.querySelectorAll<HTMLElement>('.js-draggable');
       const droppedPosition = position.y;
       //если перетащили вверх
       for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
-        if (element.uniqueId === item.uniqueId) {
+        if (element.dataset.uniqueId === item.uniqueId) {
           break;
         }
         const elementCenter =
@@ -75,7 +81,7 @@ export const BurgerConstructor = (): JSX.Element => {
       //если перетащили вниз
       for (let i = elements.length - 1; i >= 0; i--) {
         const element = elements[i];
-        if (element.uniqueId === item.uniqueId) {
+        if (element.dataset.uniqueId === item.uniqueId) {
           break;
         }
         const elementCenter =
@@ -95,8 +101,8 @@ export const BurgerConstructor = (): JSX.Element => {
     },
   });
 
-  const orderBuns = useSelector((store) => store.order.orderBuns);
-  const orderIngredients = useSelector((store) => store.order.orderIngredients);
+  const orderBuns = useAppSelector((store) => store.order.orderBuns);
+  const orderIngredients = useAppSelector((store) => store.order.orderIngredients);
   const order = [...orderBuns, ...orderIngredients];
   const total = order.reduce(
     (accumulator, currentValue) => accumulator + currentValue.price,
@@ -146,7 +152,13 @@ export const BurgerConstructor = (): JSX.Element => {
   const isButtonDisabled = !orderBuns.length || !orderIngredients.length;
 
   return (
-    <section className={`${styles.burger_constructor} mb-10`} ref={dropTarget}>
+    <section
+      className={`${styles.burger_constructor} mb-10`}
+      ref={(node) => {
+        dropTarget(node);
+      }}
+    >
+      {/* ref={dropTarget} */}
       {bun ? (
         <Fragment>
           <div draggable={false} className="mb-4">
@@ -169,7 +181,10 @@ export const BurgerConstructor = (): JSX.Element => {
       )}
       <div
         className={`${styles.burger_constructor_scrollable} custom-scroll`}
-        ref={dropSortTarget}
+        ref={(node) => {
+          dropSortTarget(node);
+        }}
+        // ref={dropSortTarget}
       >
         {orderIngredients.length ? (
           orderIngredients.map((item) => {
@@ -214,6 +229,7 @@ export const BurgerConstructor = (): JSX.Element => {
             <Button
               disabled={isButtonDisabled}
               onClick={placeAnOrder}
+              htmlType="button"
               size="large"
               type="primary"
             >

@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useFormWithValidation } from '@hooks/use-form-with-validation';
-import { useRegisterMutation } from '@services/api/authApi';
+import { useRegisterMutation, type BackendErrorData } from '@services/api/authApi';
 import { authSelector, setFormValue } from '@services/user/slice';
 import { formValidators } from '@utils/formValidators';
 
-import type { JSX } from 'react';
+import type { SerializedError } from '@reduxjs/toolkit';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import type { FormEvent, JSX } from 'react';
 
 import styles from './register.module.css';
 
@@ -24,7 +26,7 @@ export const RegisterPage = (): JSX.Element => {
     setHidePassword(!hidePassword);
   }
 
-  function handleSubmit(e): void | boolean {
+  function handleSubmit(e: FormEvent<HTMLFormElement>): void | boolean {
     e.preventDefault();
 
     if (errors) {
@@ -39,6 +41,14 @@ export const RegisterPage = (): JSX.Element => {
 
     register(values);
   }
+  let backendErrorMessage = '';
+  if (backendError) {
+    const rtkError = backendError as FetchBaseQueryError | SerializedError;
+
+    if ('data' in rtkError) {
+      backendErrorMessage = (rtkError.data as BackendErrorData)?.message || '';
+    }
+  }
   return (
     <div className={styles.content}>
       <h3>Регистрация</h3>
@@ -50,15 +60,16 @@ export const RegisterPage = (): JSX.Element => {
           name="name"
           placeholder="Имя"
           extraClass="mb-6"
+          value={values.name ? String(values.name) : ''}
         />
         <Input
           onChange={handleChange}
           placeholder="E-mail"
           name="email"
           type="email"
-          errorText={errors.email || backendError?.data?.message}
-          error={backendError || showError === 'email'}
-          value={values.email || ''}
+          errorText={errors.email || backendErrorMessage}
+          error={!!(backendError || showError === 'email')}
+          value={values.email ? String(values.email) : ''}
           extraClass="mb-6"
         />
         <Input
@@ -69,7 +80,7 @@ export const RegisterPage = (): JSX.Element => {
           error={showError === 'password'}
           placeholder="Пароль"
           name="password"
-          value={values.password || ''}
+          value={values.password ? String(values.password) : ''}
           type={hidePassword ? 'password' : 'text'}
           extraClass="mb-6"
         />

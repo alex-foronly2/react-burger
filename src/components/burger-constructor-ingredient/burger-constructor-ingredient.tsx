@@ -25,7 +25,13 @@ const BurgerConstructorElement = (props: Bun | Filling): JSX.Element => {
     });
   };
   return (
-    <div className="js-draggable mb-4" ref={dragRef}>
+    <div
+      className="js-draggable mb-4"
+      data-unique-id={props.uniqueId}
+      ref={(node) => {
+        dragRef(node);
+      }}
+    >
       <DragIcon type="primary" />
       <ConstructorElement
         handleClose={remove}
@@ -33,7 +39,7 @@ const BurgerConstructorElement = (props: Bun | Filling): JSX.Element => {
         price={props.price}
         text={props.name}
         thumbnail={props.image_mobile}
-        type="normal"
+        // type="normal"
         extraClass="ml-4"
       />
     </div>

@@ -1,6 +1,6 @@
 import { SHOW_POPUP, HIDE_POPUP } from './actions.js';
 
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction, UnknownAction } from '@reduxjs/toolkit';
 
 type modalState = {
   info: boolean | number;
@@ -16,13 +16,15 @@ type modalPayloadActionType = PayloadAction<{ type: string; id: number }> | null
 
 export const modalReducer = (
   state = initialState,
-  action: modalPayloadActionType
+  action: modalPayloadActionType | UnknownAction
 ): modalState => {
   switch (action?.type) {
-    case SHOW_POPUP:
+    case SHOW_POPUP: {
+      const showPopupAction = action as PayloadAction<{ type: string; id: number }>;
       return Object.assign({}, state, {
-        [action?.payload.type]: action?.payload.id || true,
+        [showPopupAction.payload.type]: showPopupAction.payload.id || true,
       });
+    }
     case HIDE_POPUP:
       return initialState;
     default:

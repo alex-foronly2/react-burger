@@ -1,12 +1,13 @@
 import { Preloader } from '@krgaa/react-developer-burger-ui-components';
-import { useSelector } from 'react-redux';
+
+import { useAppSelector } from '@/hooks/hooks';
 
 import type { JSX } from 'react';
 
 import styles from './order-details.module.css';
 
 export const OrderDetails = (): JSX.Element => {
-  const submittedOrder = useSelector((store) => store.order.submittedOrder);
+  const submittedOrder = useAppSelector((store) => store.order.submittedOrder);
   const isLoading = !Object.prototype.hasOwnProperty.call(submittedOrder, 'order');
 
   return isLoading ? (
@@ -14,7 +15,7 @@ export const OrderDetails = (): JSX.Element => {
   ) : (
     <div className={styles.burger_constructor_popup}>
       <div className="text text_type_digits-medium mt-10">
-        {submittedOrder.order.number}
+        {submittedOrder?.order?.number}
       </div>
       <div className="mt-8 text text_type_main-medium">идентификатор заказа</div>
       <div className="mt-15 mb-15">
