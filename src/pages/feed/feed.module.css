@@ -1,0 +1,53 @@
+.title {
+  width: 100%;
+  max-width: 1260px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.main {
+  display: flex;
+  justify-content: flex-start;
+  width: 1240px;
+  height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.orders {
+  box-sizing: border-box;
+  min-width: 650px;
+  overflow-y: auto;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.info_last_orders {
+  display: flex;
+  flex-direction: row;
+}
+
+.info_half {
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.two_column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ready {
+  color: #078081;
+}

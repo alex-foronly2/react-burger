@@ -42,3 +42,41 @@ export async function fetchWithRefresh(
 
   return response;
 }
+
+type RefreshTokenResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export async function refreshToken(): Promise<RefreshTokenResponse> {
+  if (!localStorage.getItem('refreshToken')) {
+    return Promise.reject('no refresh token');
+  }
+  const refreshResponse = await fetch(baseUrl + 'api/auth/token', {
+    method: 'POST',
+    body: JSON.stringify({ token: localStorage.getItem('refreshToken') }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!refreshResponse || !refreshResponse.ok) {
+    return Promise.reject(refreshResponse.status);
+  }
+
+  const refreshData = await refreshResponse.json();
+  if (!refreshData || !refreshData.success) {
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    return Promise.reject('invalid  json');
+  }
+
+  localStorage.setItem('refreshToken', refreshData.refreshToken);
+  localStorage.setItem('accessToken', refreshData.accessToken);
+
+  return {
+    accessToken: refreshData.accessToken,
+    refreshToken: refreshData.refreshToken,
+  };
+}

@@ -2,6 +2,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import {
   Home,
+  FeedPage,
+  FeedModal,
   NotFound,
   LoginPage,
   RegisterPage,
@@ -41,6 +43,16 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: '/feed',
+        element: <FeedPage />,
+        children: [
+          {
+            path: ':orderId',
+            element: <FeedModal />,
+          },
+        ],
+      },
+      {
         path: '/login',
         element: <ProtectedRoute onlyUnAuth component={<LoginPage />} />,
       },
@@ -67,6 +79,12 @@ const router = createBrowserRouter([
           {
             path: 'orders',
             element: <Orders />,
+            children: [
+              {
+                path: ':orderId',
+                element: <FeedModal />,
+              },
+            ],
           },
         ],
       },
