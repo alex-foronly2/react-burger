@@ -27,10 +27,10 @@ export const FeedPage = (): JSX.Element => {
   const { isLoading, data: ingredients } = useGetIngredientsQuery();
 
   useEffect((): (() => void) => {
-    dispatch(connect({ endpoint: 'orders/all' }));
+    dispatch(connect({ socketType: 'orders', endpoint: 'orders/all' }));
 
     return (): void => {
-      dispatch(disconnect());
+      dispatch(disconnect('orders'));
     };
   }, []);
   const orders = useAppSelector(selectOrders);

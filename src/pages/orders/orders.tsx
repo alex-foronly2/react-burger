@@ -8,7 +8,7 @@ import {
   useGetIngredientsQuery,
   type ingredientType,
 } from '@services/api/ingredientsApi';
-import { connect, selectOrders } from '@services/user/socket-slice';
+import { connect, disconnect, selectOrders } from '@services/user/socket-slice';
 
 import type { JSX } from 'react';
 
@@ -23,10 +23,15 @@ export const Orders = (): JSX.Element => {
   useEffect(() => {
     dispatch(
       connect({
-        token: localStorage.getItem('accessToken')?.replace('Bearer ', ''),
-        endpoint: 'orders',
+        endpoint:
+          'orders?token=' + localStorage.getItem('accessToken')?.replace('Bearer ', ''),
+        socketType: 'orders',
       })
     );
+
+    return (): void => {
+      dispatch(disconnect('orders'));
+    };
   }, []);
 
   const orders = useAppSelector(selectOrders);

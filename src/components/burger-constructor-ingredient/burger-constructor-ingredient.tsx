@@ -4,8 +4,8 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import { memo } from 'react';
 import { useDrag } from 'react-dnd';
-import { useDispatch } from 'react-redux';
 
+import { useAppDispatch } from '@/hooks/hooks';
 import { REMOVE_ITEM } from '@services/tasks/actions';
 
 import type { JSX } from 'react';
@@ -13,7 +13,7 @@ import type { JSX } from 'react';
 import type { Bun, Filling } from '@services/tasks/orderReducer';
 
 const BurgerConstructorElement = (props: Bun | Filling): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [, dragRef] = useDrag({
     type: 'orderItem',
     item: { uniqueId: props.uniqueId },

@@ -6,40 +6,43 @@ import type { Middleware, PayloadAction } from '@reduxjs/toolkit';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_KEY;
 
-let ws: WebSocket | null = null;
+export type SocketType = string;
+
+//let ws: WebSocket | null = null;
+const ws: Record<string, WebSocket> = {};
 
 let isConnected = false; // Флаг: считается ли пользователь подключённым?
 const reconnectPeriod = 3000; // 3 секунды
 let reconnectTimerId: ReturnType<typeof setTimeout> | number = 0;
 
-export type RefreshPayload = {
+export type ConnectPayload = {
   endpoint: string;
-  token?: string;
+  socketType: SocketType;
 };
 
 const socketMiddleware = (withTokenRefresh = false): Middleware => {
   return (store) => (next) => (action) => {
-    const { type } = action as PayloadAction<RefreshPayload>;
+    const { type } = action as PayloadAction<ConnectPayload>;
 
     if (type === 'socket/connect') {
-      const { endpoint, token } = (action as PayloadAction<RefreshPayload>).payload;
+      const { endpoint, socketType } = (action as PayloadAction<ConnectPayload>).payload;
       isConnected = true;
 
       // Закрываем старое соединение, если есть
-      if (ws) {
-        ws.close();
+      if (ws && Object.hasOwn(ws, socketType)) {
+        ws[socketType].close();
       }
 
       // Создаём новый WebSocket
-      ws = new WebSocket(`${SOCKET_URL + endpoint}?token=${token}`);
+      ws[socketType] = new WebSocket(`${SOCKET_URL + endpoint}`);
 
       // Обработчик открытия соединения
-      ws.onopen = (): void => {
-        store.dispatch(onOpen());
+      ws[socketType].onopen = (): void => {
+        store.dispatch(onOpen(socketType));
       };
 
       // Обработчик входящих сообщений
-      ws.onmessage = (event: MessageEvent<string>): void => {
+      ws[socketType].onmessage = (event: MessageEvent<string>): void => {
         try {
           const data = JSON.parse(event.data);
           console.log('Сообщение с сервера:', data);
@@ -50,38 +53,45 @@ const socketMiddleware = (withTokenRefresh = false): Middleware => {
               .then((refreshedData) => {
                 store.dispatch(
                   connect({
-                    endpoint: endpoint,
-                    token: refreshedData.accessToken.replace('Bearer ', ''),
+                    endpoint:
+                      endpoint.split('token=')[0] +
+                      'token=' +
+                      refreshedData.accessToken.replace('Bearer ', ''),
+                    socketType: socketType,
                   })
                 );
               })
               .catch(() => {
-                store.dispatch(onError('Не удалось обновить токен'));
+                store.dispatch(
+                  onError({ message: 'Не удалось обновить токен', socketType })
+                );
               });
 
-            store.dispatch(disconnect());
+            store.dispatch(disconnect(socketType));
             return;
           }
 
           store.dispatch(onOrder(data));
         } catch (error) {
           console.error(error);
-          store.dispatch(onError('Ошибка парсинга сообщения от сервера'));
+          store.dispatch(
+            onError({ message: 'Ошибка парсинга сообщения от сервера', socketType })
+          );
         }
       };
 
       // Обработчик ошибок
-      ws.onerror = (): void => {
-        store.dispatch(onError('Ошибка WebSocket-соединения'));
+      ws[socketType].onerror = (): void => {
+        store.dispatch(onError({ message: 'Ошибка WebSocket-соединения', socketType }));
       };
 
       // Обработчик закрытия соединения
-      ws.onclose = (): void => {
-        store.dispatch(onClose());
-        ws = null;
+      ws[socketType].onclose = (): void => {
+        store.dispatch(onClose(socketType));
+        delete ws[socketType]; // = null;
         if (isConnected) {
           reconnectTimerId = setTimeout(() => {
-            store.dispatch(connect({ endpoint: endpoint, token: token }));
+            store.dispatch(connect({ endpoint: endpoint, socketType: socketType }));
           }, reconnectPeriod);
         }
       };
@@ -89,12 +99,14 @@ const socketMiddleware = (withTokenRefresh = false): Middleware => {
 
     // Обработка экшена disconnect
     if (type === 'socket/disconnect') {
+      const socketType = (action as PayloadAction<string>).payload;
       isConnected = false;
       clearTimeout(reconnectTimerId);
       reconnectTimerId = 0;
-      if (ws) {
-        ws.close();
-        ws = null;
+      if (ws && Object.hasOwn(ws, socketType)) {
+        ws[socketType].close();
+        delete ws[socketType];
+        //ws = null;
       }
     }
 

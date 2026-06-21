@@ -1,6 +1,6 @@
-import { useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { useAppSelector } from '@/hooks/hooks';
 import { userSelector } from '@services/user/slice.js';
 
 import type { JSX } from 'react';
@@ -14,7 +14,7 @@ export const ProtectedRoute = ({
   onlyUnAuth = false,
   component,
 }: ProtectedRouteProps): JSX.Element => {
-  const user = useSelector(userSelector);
+  const user = useAppSelector(userSelector);
 
   const location = useLocation();
 

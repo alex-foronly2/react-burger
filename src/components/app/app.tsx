@@ -48,7 +48,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: ':orderId',
-            element: <FeedModal />,
+            element: <FeedModal parent="/feed" />,
           },
         ],
       },
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: ':orderId',
-                element: <FeedModal />,
+                element: <FeedModal parent="/profile/orders" />,
               },
             ],
           },

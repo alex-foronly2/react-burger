@@ -4,7 +4,7 @@ import {
   Preloader,
 } from '@krgaa/react-developer-burger-ui-components';
 import { memo } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Modal from '@components/modal/modal';
 import { useAppSelector } from '@hooks/hooks';
@@ -18,11 +18,13 @@ import type { ingredientType } from '@services/api/ingredientsApi';
 
 import styles from './feed-modal.module.css';
 
-const OrderInfoBody = (): JSX.Element => {
+type feedModal = {
+  parent: string;
+};
+const OrderInfoBody = (props: feedModal): JSX.Element => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const orders = useAppSelector(selectOrders);
-  const location = useLocation();
   let orderContent = null;
   if (orders.length) {
     orderContent = orders.find((order) => order._id === orderId);
@@ -45,7 +47,7 @@ const OrderInfoBody = (): JSX.Element => {
     if (e) {
       e.stopPropagation();
     }
-    navigate(location.state?.from || '/feed');
+    navigate(props.parent);
   };
   if (error) {
     return <Modal onClose={closeModal}>{String(error)}</Modal>;
@@ -106,11 +108,11 @@ const OrderInfoBody = (): JSX.Element => {
                       src={item.ingredient.image_mobile}
                     />
                   </div>
-                  <div className={`text text_type_digits-small`}>
+                  <div className={`text text_type_main-default ml-2`}>
                     {item.ingredient.name}
                   </div>
                 </div>
-                <div className={`${styles.price} text text_type_digits-small`}>
+                <div className={`${styles.price} text text_type_digits-default`}>
                   {item.amount} x {item.ingredient.price}
                   <CurrencyIcon type="primary" className="ml-2" />
                 </div>
