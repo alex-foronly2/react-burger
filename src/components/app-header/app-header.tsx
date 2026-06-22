@@ -4,7 +4,7 @@ import {
   ProfileIcon,
   Logo,
 } from '@krgaa/react-developer-burger-ui-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 import type { JSX } from 'react';
 
@@ -36,9 +36,11 @@ export const AppHeader = (): JSX.Element => {
             <p className="text text_type_main-default ml-2">Лента заказов</p>
           </NavLink>
         </div>
-        <div className={styles.logo}>
-          <Logo />
-        </div>
+        <Link to="/">
+          <div className={styles.logo}>
+            <Logo />
+          </div>
+        </Link>
         <NavLink
           to={'/profile'}
           className={({ isActive }) =>

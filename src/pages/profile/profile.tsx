@@ -1,8 +1,7 @@
 import { Button, Input } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { useAppSelector } from '@/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { useFormWithValidation } from '@hooks/use-form-with-validation';
 import { useUpdateUserMutation, type BackendErrorData } from '@services/api/authApi';
 import {
@@ -19,7 +18,7 @@ import type { FormEvent, JSX } from 'react';
 
 export const ProfilePage = (): JSX.Element => {
   const user = useAppSelector(userSelector);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [showError, setShowError] = useState('');
   const [updateUser, { error: backendError }] = useUpdateUserMutation();
   useEffect(() => {

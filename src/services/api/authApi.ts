@@ -12,7 +12,7 @@ type queryArgs = {
   method?: string;
 };
 
-async function baseQueryWithRefresh<T>(args: queryArgs): Promise<{ data: T }> {
+export async function baseQueryWithRefresh<T>(args: queryArgs): Promise<{ data: T }> {
   const { url, method = 'GET', ...rest } = args;
   const token = localStorage.getItem('accessToken');
 

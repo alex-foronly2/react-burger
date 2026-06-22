@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 
-import { useAppDispatch } from '@hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@hooks/hooks';
 
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import type { ChangeEvent } from 'react';
@@ -43,7 +42,7 @@ export function useFormWithValidation(
   setFormValue: SetFormValueFunction,
   validators: ValidatorsMap
 ): UseFormWithValidationResult {
-  const values = useSelector(selector);
+  const values = useAppSelector(selector);
   const [errors, setErrors] = useState(initErrors(values));
   const [isValid, setIsValid] = useState(false);
   const dispatch = useAppDispatch();

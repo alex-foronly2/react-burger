@@ -1,0 +1,5 @@
+.player_orders {
+  min-width: 900px;
+  height: 70vh;
+  overflow-y: auto;
+}

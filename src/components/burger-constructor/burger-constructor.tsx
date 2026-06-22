@@ -5,11 +5,10 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import { Fragment } from 'react';
 import { useDrop } from 'react-dnd';
-import { useSelector, useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useAppSelector } from '@/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks/hooks';
 import { BurgerConstructorIngredient } from '@components/burger-constructor-ingredient/burger-constructor-ingredient';
 import Modal from '@components/modal/modal';
 import { OrderDetails } from '@components/order-details/order-details';
@@ -31,10 +30,10 @@ import type { Filling } from '@services/tasks/orderReducer';
 import styles from './burger-constructor.module.css';
 
 export const BurgerConstructor = (): JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const showModal = useAppSelector((store) => store.modal.order);
   const [createOrder] = useCreateOrderMutation();
-  const user = useSelector(userSelector);
+  const user = useAppSelector(userSelector);
   const navigate = useNavigate();
   const location = useLocation();
   const [, dropTarget] = useDrop({

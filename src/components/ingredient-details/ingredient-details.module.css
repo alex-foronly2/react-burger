@@ -1,7 +1,14 @@
+.burger_ingredient_parent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .burger_ingredient_info {
   display: flex;
   justify-content: center;
   align-items: center;
+  max-width: 500px;
 }
 
 .burger_ingredient_wide {
@@ -15,6 +22,7 @@
 }
 
 .burger_ingredient_info img {
+  flex-shrink: 0;
   box-sizing: border-box;
   width: 100%;
   height: 100%;

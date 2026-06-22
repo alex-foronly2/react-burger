@@ -1,32 +1,35 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
-const API_HEADERS = {
-  'Content-Type': 'application/json',
-};
-
-const baseUrl = import.meta.env.VITE_API_KEY;
+import { baseQueryWithRefresh } from '@services/api/authApi';
 
 export const orderApi = createApi({
   reducerPath: 'orderApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: baseUrl,
-    prepareHeaders: (headers) => {
-      for (const [key, value] of Object.entries(API_HEADERS)) {
-        headers.set(key, value);
-      }
-    },
-  }),
+  baseQuery: baseQueryWithRefresh,
   tagTypes: ['ORDER'],
   endpoints: (builder) => ({
     createOrder: builder.mutation({
       query: (data) => ({
-        url: '/api/orders',
+        url: 'api/orders',
         method: 'POST',
-        body: data,
+        body: JSON.stringify(data),
       }),
       invalidatesTags: ['ORDER'],
+      transformResponse: async (response) => {
+        const data = await response.json();
+
+        if (!data.success) {
+          return null;
+        }
+        return data;
+      },
+    }),
+    getTheOrder: builder.query({
+      query: (data: string) => ({
+        url: '/api/orders/' + data,
+        method: 'GET',
+      }),
     }),
   }),
 });
 
-export const { useCreateOrderMutation } = orderApi;
+export const { useCreateOrderMutation, useGetTheOrderQuery } = orderApi;
