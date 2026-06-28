@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
+import { testName, testEmail, testPassword } from '@services/user/slice.moke';
+
 import authReducer, {
   authSelector,
   userSelector,
@@ -14,8 +16,8 @@ describe('Selectors', () => {
     const mockState = {
       auth: {
         form: {
-          email: 'test@mail.ru',
-          password: '123456',
+          email: testEmail,
+          password: testPassword,
         },
         user: null,
         userForm: {},
@@ -29,20 +31,20 @@ describe('Selectors', () => {
     const result = authSelector(mockState);
 
     expect(result).toEqual({
-      email: 'test@mail.ru',
-      password: '123456',
+      email: testEmail,
+      password: testPassword,
     });
   });
   it('должен возвращать user', () => {
     const mockState = {
       auth: {
         form: {
-          email: 'test@mail.ru',
-          password: '123456',
+          email: testEmail,
+          password: testPassword,
         },
         user: {
-          name: 'test',
-          email: 'test@mail.ru',
+          name: testName,
+          email: testEmail,
         },
         userForm: {},
         passwordForm: {},
@@ -53,7 +55,7 @@ describe('Selectors', () => {
     };
 
     const result = userSelector(mockState);
-    expect(result).toEqual({ name: 'test', email: 'test@mail.ru' });
+    expect(result).toEqual({ name: testName, email: testEmail });
   });
 });
 
@@ -65,22 +67,22 @@ describe('Reducers', () => {
   it('должен задавать значение форме смены пароля', () => {
     const result = authReducer(
       undefined,
-      setPasswordFormValue({ field: 'password', value: '123456' })
+      setPasswordFormValue({ field: 'password', value: testPassword })
     );
-    expect(result.passwordForm).toEqual({ password: '123456' });
+    expect(result.passwordForm).toEqual({ password: testPassword });
   });
   it('должен задавать значение форме данных пользователя', () => {
     const result = authReducer(
       undefined,
-      setUserFormValue({ field: 'name', value: 'Ivan' })
+      setUserFormValue({ field: 'name', value: testName })
     );
-    expect(result.userForm).toEqual({ name: 'Ivan' });
+    expect(result.userForm).toEqual({ name: testName });
   });
   it('должен задавать значение форме входа', () => {
     const result = authReducer(
       undefined,
-      setFormValue({ field: 'email', value: 'test@mail.ru' })
+      setFormValue({ field: 'email', value: testEmail })
     );
-    expect(result.form).toEqual({ email: 'test@mail.ru', password: '' });
+    expect(result.form).toEqual({ email: testEmail, password: '' });
   });
 });

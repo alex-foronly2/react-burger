@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, type Mock, type MockInstance } from 'vitest';
 
+import { testName } from '@services/user/slice.moke';
+
 import socketMiddleware from './socket-middleware';
 import { onOpen, selectOrders, selectTotal, selectTotalToday } from './socket-slice';
 
@@ -162,7 +164,7 @@ describe('Selectors', () => {
   const order = {
     createdAt: '2026-06-06T10:33:43.723Z',
     ingredients: ['_1'],
-    name: 'test',
+    name: testName,
     number: 1,
     status: 'done' as SocketSlice.Status,
     updatedAt: '2026-06-06T10:33:43.723Z',

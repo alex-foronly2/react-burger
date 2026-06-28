@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  testEmail,
+  testName,
+  orderBun,
+  orderIngredient,
+} from '@services/user/slice.moke';
+
+import {
   ADD_ITEM,
   SORT_ITEMS,
   REMOVE_ITEM,
@@ -9,7 +16,38 @@ import {
 } from './actions.js';
 import { orderReducer } from './orderReducer';
 
-type ingredientType = 'main' | 'sauce';
+import type { ingredientType } from '@services/user/slice.moke';
+
+// type ingredientType = 'main' | 'sauce';
+//
+// export const orderBun = {
+//   _id: '692889f16bf770001bfeb4cd',
+//   name: 'Флюоресцентная булка R2-D3',
+//   type: 'bun' as const,
+//   proteins: 44,
+//   fat: 26,
+//   carbohydrates: 85,
+//   calories: 643,
+//   price: 988,
+//   image: 'https://code.s3.yandex.net/react/code/bun-01.png',
+//   image_mobile: 'https://code.s3.yandex.net/react/code/bun-01-mobile.png',
+//   image_large: 'https://code.s3.yandex.net/react/code/bun-01-large.png',
+//   __v: 0 as const,
+// };
+// export const orderIngredient = {
+//   _id: '692889f16bf770001bfeb4d0',
+//   name: 'Говяжий метеорит (отбивная)',
+//   type: 'main' as ingredientType,
+//   proteins: 800,
+//   fat: 800,
+//   carbohydrates: 300,
+//   calories: 2674,
+//   price: 3000,
+//   image: 'https://code.s3.yandex.net/react/code/meat-04.png',
+//   image_mobile: 'https://code.s3.yandex.net/react/code/meat-04-mobile.png',
+//   image_large: 'https://code.s3.yandex.net/react/code/meat-04-large.png',
+//   __v: 0 as const,
+// };
 
 describe('Order Reducers', () => {
   const bun = {
@@ -81,54 +119,11 @@ describe('Order Reducers', () => {
     success: true,
     name: 'Флюоресцентный метеоритный бургер',
     order: {
-      ingredients: [
-        {
-          _id: '692889f16bf770001bfeb4cd',
-          name: 'Флюоресцентная булка R2-D3',
-          type: 'bun' as const,
-          proteins: 44,
-          fat: 26,
-          carbohydrates: 85,
-          calories: 643,
-          price: 988,
-          image: 'https://code.s3.yandex.net/react/code/bun-01.png',
-          image_mobile: 'https://code.s3.yandex.net/react/code/bun-01-mobile.png',
-          image_large: 'https://code.s3.yandex.net/react/code/bun-01-large.png',
-          __v: 0 as const,
-        },
-        {
-          _id: '692889f16bf770001bfeb4d0',
-          name: 'Говяжий метеорит (отбивная)',
-          type: 'main' as ingredientType,
-          proteins: 800,
-          fat: 800,
-          carbohydrates: 300,
-          calories: 2674,
-          price: 3000,
-          image: 'https://code.s3.yandex.net/react/code/meat-04.png',
-          image_mobile: 'https://code.s3.yandex.net/react/code/meat-04-mobile.png',
-          image_large: 'https://code.s3.yandex.net/react/code/meat-04-large.png',
-          __v: 0 as const,
-        },
-        {
-          _id: '692889f16bf770001bfeb4cd',
-          name: 'Флюоресцентная булка R2-D3',
-          type: 'bun' as const,
-          proteins: 44,
-          fat: 26,
-          carbohydrates: 85,
-          calories: 643,
-          price: 988,
-          image: 'https://code.s3.yandex.net/react/code/bun-01.png',
-          image_mobile: 'https://code.s3.yandex.net/react/code/bun-01-mobile.png',
-          image_large: 'https://code.s3.yandex.net/react/code/bun-01-large.png',
-          __v: 0 as const,
-        },
-      ],
+      ingredients: [orderBun, orderIngredient, orderBun],
       _id: '6a4091c541cff5001b6e6d13',
       owner: {
-        name: 'Ivan',
-        email: 'test@mail.ru',
+        name: testName,
+        email: testEmail,
         createdAt: '2026-06-06T10:33:43.723Z',
         updatedAt: '2026-06-15T02:37:13.282Z',
       },

@@ -1,29 +1,40 @@
 import { test, expect } from '@playwright/test';
-import * as fs from 'fs';
+import {testEmail, testName, orderBun, orderIngredient} from "@services/user/slice.moke";
 
 let isRequestSent = false;
 let requestPayload: Record<string, unknown> | null = null;
+const buttonName = 'оформить заказ';
+const createBurgerHeader = 'Соберите бургер';
+const chooseBun = 'Выберите булку';
+const chooseIngredient = 'Выберите игредиенты';
 
 test.describe('Оформление заказа', () => {
+  test('должен загрузить ингредиенты из HAR-файла', async ({ page }) => {
+    await page.routeFromHAR('./e2e/hars/ingredients.har', {
+      url: 'https://new-stellarburgers.education-services.ru/api/ingredients',
+      update: false,
+    });
+    await page.goto('/');
+    const responsePromise = page.waitForResponse('**/api/ingredients');
+
+    await page.getByText('Соберите бургер').waitFor({ state: 'visible' });
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+  });
   test('когда пользователь не авторизован', async ({ page }) => {
-    const ingredientsData = JSON.parse(
-      fs.readFileSync('e2e/hars/ingredients.json', 'utf-8')
-    );
-    await page.route('**/api/ingredients', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, data: ingredientsData }),
-      });
+    await page.routeFromHAR('./e2e/hars/ingredients.har', {
+      url: '**/api/ingredients',
+      update: false,
+      notFound: 'abort'
     });
 
     await page.goto('/');
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
-    await expect(page.getByText('Флюоресцентная булка R2-D3')).toBeVisible();
-    await expect(page.getByText('Выберите булку').first()).toBeVisible();
+    await expect(page.getByText(createBurgerHeader)).toBeVisible();
+    await expect(page.getByText(orderBun.name)).toBeVisible();
+    await expect(page.getByText(chooseBun).first()).toBeVisible();
 
-    const bun = page.getByText('Флюоресцентная булка R2-D3');
-    const bunDrop = page.getByText('Выберите булку').first();
+    const bun = page.getByText(orderBun.name);
+    const bunDrop = page.getByText(chooseBun).first();
 
     await expect(page.getByTestId('ingredient-info-popup')).not.toBeVisible();
     await bun.click();//открываем попап с информацией об ингредиенте
@@ -32,20 +43,21 @@ test.describe('Оформление заказа', () => {
     await expect(page.getByTestId('ingredient-info-popup')).not.toBeVisible();//попап закрылся
 
     await bun.dragTo(bunDrop);//добавляем булку
+    const constructor = page.getByTestId('burger-constructor');
 
-    await expect(page.getByTestId('burger-constructor')).toBeVisible();
-    await expect(page.getByTestId('burger-constructor').getByText('Флюоресцентная булка R2-D3')).toHaveCount(2);//перетащили булку, добавилось 2 элемента
+    await expect(constructor).toBeVisible();
+    await expect(constructor.getByText(orderBun.name)).toHaveCount(2);//перетащили булку, добавилось 2 элемента
 
-    const button = page.getByRole('button', { name: /оформить заказ/i });
+    const button = page.getByRole('button', { name: new RegExp(buttonName, 'i') });
 
     //кнопка должна быть неактивна пока не добавили и булки и ингридиенты
     await expect(button).toBeDisabled();
 
 
-    const main = page.getByText('Говяжий метеорит (отбивная)');
-    const mainDrop = page.getByText('Выберите игредиенты');
+    const main = page.getByText(orderIngredient.name);
+    const mainDrop = page.getByText(chooseIngredient);
     await main.dragTo(mainDrop);//добавляем начинку бургера
-    await expect(page.getByTestId('burger-constructor').getByText('Говяжий метеорит (отбивная)')).toHaveCount(1);//перетащили ингредиент, добавился 1 элемент
+    await expect(constructor.getByText(orderIngredient.name)).toHaveCount(1);//перетащили ингредиент, добавился 1 элемент
 
 
     await expect(button).toBeEnabled();
@@ -55,16 +67,10 @@ test.describe('Оформление заказа', () => {
 
   });
   test('когда пользователь авторизован', async ({ page }) => {
-    const ingredientsData = JSON.parse(
-      fs.readFileSync('e2e/hars/ingredients.json', 'utf-8')
-    );
-
-    await page.route('**/api/ingredients', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ success: true, data: ingredientsData }),
-      });
+    await page.routeFromHAR('./e2e/hars/ingredients.har', {
+      url: '**/api/ingredients',
+      update: false,
+      notFound: 'abort'
     });
 
     await page.route('**/api/orders', async (route) => {
@@ -79,53 +85,14 @@ test.describe('Оформление заказа', () => {
               "name": "Флюоресцентный метеоритный бургер",
               "order": {
                 "ingredients": [
-                  {
-                    "_id": "692889f16bf770001bfeb4cd",
-                    "name": "Флюоресцентная булка R2-D3",
-                    "type": "bun",
-                    "proteins": 44,
-                    "fat": 26,
-                    "carbohydrates": 85,
-                    "calories": 643,
-                    "price": 988,
-                    "image": "https://code.s3.yandex.net/react/code/bun-01.png",
-                    "image_mobile": "https://code.s3.yandex.net/react/code/bun-01-mobile.png",
-                    "image_large": "https://code.s3.yandex.net/react/code/bun-01-large.png",
-                    "__v": 0
-                  },
-                  {
-                    "_id": "692889f16bf770001bfeb4d0",
-                    "name": "Говяжий метеорит (отбивная)",
-                    "type": "main",
-                    "proteins": 800,
-                    "fat": 800,
-                    "carbohydrates": 300,
-                    "calories": 2674,
-                    "price": 3000,
-                    "image": "https://code.s3.yandex.net/react/code/meat-04.png",
-                    "image_mobile": "https://code.s3.yandex.net/react/code/meat-04-mobile.png",
-                    "image_large": "https://code.s3.yandex.net/react/code/meat-04-large.png",
-                    "__v": 0
-                  },
-                  {
-                    "_id": "692889f16bf770001bfeb4cd",
-                    "name": "Флюоресцентная булка R2-D3",
-                    "type": "bun",
-                    "proteins": 44,
-                    "fat": 26,
-                    "carbohydrates": 85,
-                    "calories": 643,
-                    "price": 988,
-                    "image": "https://code.s3.yandex.net/react/code/bun-01.png",
-                    "image_mobile": "https://code.s3.yandex.net/react/code/bun-01-mobile.png",
-                    "image_large": "https://code.s3.yandex.net/react/code/bun-01-large.png",
-                    "__v": 0
-                  }
+                  orderBun,
+                  orderIngredient,
+                  orderBun
                 ],
                 "_id": "6a4091c541cff5001b6e6d13",
                 "owner": {
-                  "name": "Ivan",
-                  "email": "test@mail.ru",
+                  "name": testName,
+                  "email": testEmail,
                   "createdAt": "2026-06-06T10:33:43.723Z",
                   "updatedAt": "2026-06-15T02:37:13.282Z"
                 },
@@ -145,18 +112,18 @@ test.describe('Оформление заказа', () => {
       }
     });
 
-    await page.addInitScript(() => {
-      localStorage.setItem('user', '{"email":"test@mail.ru","name":"Ivan"}');
-    });
+    await page.addInitScript(({email, name}) => {
+      localStorage.setItem('user', '{"email":"'+email+'","name":"'+name+'"}');
+    }, { email: testEmail, name: testName });
 
     await page.goto('/');
-    await expect(page.getByText('Соберите бургер')).toBeVisible();
-    await expect(page.getByText('Флюоресцентная булка R2-D3')).toBeVisible();
-    await expect(page.getByText('Выберите булку').first()).toBeVisible();
+    await expect(page.getByText(createBurgerHeader)).toBeVisible();
+    await expect(page.getByText(orderBun.name)).toBeVisible();
+    await expect(page.getByText(chooseBun).first()).toBeVisible();
 
 
-    const bun = page.getByText('Флюоресцентная булка R2-D3');
-    const bunDrop = page.getByText('Выберите булку').first();
+    const bun = page.getByText(orderBun.name);
+    const bunDrop = page.getByText(chooseBun).first();
 
     await expect(page.getByTestId('ingredient-info-popup')).not.toBeVisible();
     await bun.click();
@@ -165,21 +132,21 @@ test.describe('Оформление заказа', () => {
     await expect(page.getByTestId('ingredient-info-popup')).not.toBeVisible();
 
     await bun.dragTo(bunDrop);
+    const constructor = page.getByTestId('burger-constructor');
 
-    await expect(page.getByTestId('burger-constructor')).toBeVisible();
-    await expect(page.getByTestId('burger-constructor').getByText('Флюоресцентная булка R2-D3')).toHaveCount(2);//перетащили булку, добавилось 2 элемента
+    await expect(constructor).toBeVisible();
+    await expect(constructor.getByText(orderBun.name)).toHaveCount(2);//перетащили булку, добавилось 2 элемента
 
-    const button = page.getByRole('button', { name: /оформить заказ/i });
+    const button = page.getByRole('button', { name: new RegExp(buttonName, 'i') });
 
     //кнопка должна быть неактивна пока не добавили и булки и ингридиенты
     await expect(button).toBeDisabled();
 
 
-    const main = page.getByText('Говяжий метеорит (отбивная)');
-    const mainDrop = page.getByText('Выберите игредиенты');
+    const main = page.getByText(orderIngredient.name);
+    const mainDrop = page.getByText(chooseIngredient);
     await main.dragTo(mainDrop);
-    await expect(page.getByTestId('burger-constructor').getByText('Говяжий метеорит (отбивная)')).toHaveCount(1);//перетащили ингредиент, добавился 1 элемент
-
+    await expect(constructor.getByText(orderIngredient.name)).toHaveCount(1);//перетащили ингредиент, добавился 1 элемент
 
     await expect(button).toBeEnabled();
     await expect(page.getByTestId('order-popup')).not.toBeVisible();
@@ -197,9 +164,12 @@ test.describe('Оформление заказа', () => {
     // проверяем ответ
     expect(orderResponse.success).toBeTruthy();
     expect(orderResponse.order).toHaveProperty('ingredients');
-    expect(orderResponse.order.owner.name).toEqual('Ivan');
+    expect(orderResponse.order.owner.name).toEqual(testName);
     expect(orderResponse.order.status).toEqual('done');
     expect(orderResponse.order.ingredients.length).toEqual(3);
+
+    //проверяем на соответствие номера заказа
+    expect(page.getByTestId('order-number')).toHaveText(String(orderResponse.order.number));
 
 
     //проверяем что попап с информацией о заказе показан пользователю
