@@ -49,7 +49,7 @@ export const LoginPage = (): JSX.Element => {
     }
   }
   return (
-    <div className={styles.content}>
+    <div className={styles.content} data-testid="login-page">
       <h3>Вход</h3>
       <form noValidate onSubmit={handleSubmit} className={styles.form}>
         <Input

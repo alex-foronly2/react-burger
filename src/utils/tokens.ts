@@ -49,6 +49,7 @@ type RefreshTokenResponse = {
 };
 
 export async function refreshToken(): Promise<RefreshTokenResponse> {
+  console.log('refresh token');
   if (!localStorage.getItem('refreshToken')) {
     return Promise.reject('no refresh token');
   }

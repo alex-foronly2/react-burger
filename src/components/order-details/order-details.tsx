@@ -13,8 +13,8 @@ export const OrderDetails = (): JSX.Element => {
   return isLoading ? (
     <Preloader />
   ) : (
-    <div className={styles.burger_constructor_popup}>
-      <div className="text text_type_digits-medium mt-10">
+    <div className={styles.burger_constructor_popup} data-testid="order-popup">
+      <div className="text text_type_digits-medium mt-10" data-testid="order-number">
         {submittedOrder?.order?.number}
       </div>
       <div className="mt-8 text text_type_main-medium">идентификатор заказа</div>

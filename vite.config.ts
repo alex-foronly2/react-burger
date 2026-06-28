@@ -19,10 +19,11 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
-  base: '',
+  base: '/react-burger/',
   test: {
     globals: true,
     environment: 'jsdom',
+    include: ['**/*.test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     setupFiles: ['./vitest-setup.js'],
   },
   server: {

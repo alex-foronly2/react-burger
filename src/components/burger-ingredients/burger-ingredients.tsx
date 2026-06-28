@@ -1,6 +1,6 @@
 import { Preloader, Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, Fragment, useRef, memo } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import { useAppSelector } from '@/hooks/hooks';
 import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredient';
@@ -109,17 +109,17 @@ const BurgerIngredientsBody = (): JSX.Element => {
               ingredients
                 .filter((ingredients) => ingredients.type === type.type)
                 .map((ingredient) => (
-                  <Link
+                  // <Link
+                  //   key={ingredient._id}
+                  //   to={{ pathname: `/ingredients/${ingredient._id}` }}
+                  //   state={{ fromClick: true }}
+                  // >
+                  <BurgerIngredient
+                    ingredient={ingredient}
                     key={ingredient._id}
-                    to={{ pathname: `/ingredients/${ingredient._id}` }}
-                    state={{ fromClick: true }}
-                  >
-                    <BurgerIngredient
-                      ingredient={ingredient}
-                      key={ingredient._id}
-                      count={count[ingredient._id] || 0}
-                    />
-                  </Link>
+                    count={count[ingredient._id] || 0}
+                  />
+                  //</Link>
                 ))}
           </Fragment>
         ))}

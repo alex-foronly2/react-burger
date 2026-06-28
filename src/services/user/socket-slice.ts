@@ -4,7 +4,7 @@ import type { ConnectPayload, SocketType } from './socket-middleware';
 
 // Интерфейсы для данных
 
-type Status = 'done' | 'pending' | 'created';
+export type Status = 'done' | 'pending' | 'created';
 
 export type Order = {
   createdAt: string;
