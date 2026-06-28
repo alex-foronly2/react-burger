@@ -92,12 +92,6 @@ export const authSlice = createSlice({
       state.userForm = state.user ?? {};
       state.userForm.password = '';
     },
-    setIsAuthChecked: (state, action) => {
-      state.isAuthChecked = action.payload;
-    },
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
   },
   selectors: {
     authSelector: (state) => state.form,
@@ -151,3 +145,5 @@ export const {
   userFormSelector,
   passwordFormSelector,
 } = authSlice.selectors;
+
+export default authSlice.reducer;

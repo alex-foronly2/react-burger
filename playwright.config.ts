@@ -26,7 +26,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:15173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -38,11 +38,26 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    // {
+    //   name: 'chromium-custom',
+    //   use: {
+    //     browserName: 'chromium',
+    //     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    //   },
+    // },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
+
+    // {
+    //   name: 'firefox-custom',
+    //   use: {
+    //     browserName: 'firefox',
+    //     executablePath: 'C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe',
+    //   },
+    // },
 
     {
       name: 'webkit',
@@ -71,9 +86,10 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    // command: 'npm run start',
+    command: 'npm run dev -- --host --port 15173',
+    url: 'http://localhost:15173',
+    reuseExistingServer: !process.env.CI,
+  },
 });

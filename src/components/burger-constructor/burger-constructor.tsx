@@ -152,6 +152,7 @@ export const BurgerConstructor = (): JSX.Element => {
 
   return (
     <section
+      data-testid="burger-constructor"
       className={`${styles.burger_constructor} mb-10`}
       ref={(node) => {
         dropTarget(node);

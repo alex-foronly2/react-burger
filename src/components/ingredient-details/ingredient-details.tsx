@@ -40,7 +40,10 @@ const IngredientDetailsBody = (
 
   return (
     <>
-      <div className={styles.burger_ingredient_parent}>
+      <div
+        className={styles.burger_ingredient_parent}
+        data-testid="ingredient-info-popup"
+      >
         <div className={styles.burger_ingredient_info}>
           <img className="pl-4 pr-4" alt={props.name} src={props.image_large} />
         </div>
