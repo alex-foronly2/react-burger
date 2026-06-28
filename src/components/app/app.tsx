@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 
 import {
   Home,
@@ -19,7 +19,7 @@ import { ProtectedRoute } from '@components/protected-route';
 
 import type { JSX } from 'react';
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <Layout />,
