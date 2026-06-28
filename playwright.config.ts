@@ -38,26 +38,11 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // {
-    //   name: 'chromium-custom',
-    //   use: {
-    //     browserName: 'chromium',
-    //     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    //   },
-    // },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
-    // {
-    //   name: 'firefox-custom',
-    //   use: {
-    //     browserName: 'firefox',
-    //     executablePath: 'C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe',
-    //   },
-    // },
 
     {
       name: 'webkit',
